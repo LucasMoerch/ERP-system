@@ -350,6 +350,7 @@ export function renderTimeTracker(): HTMLElement {
      <label for="totalTime" class="form-label">Total Time</label> <br>
      <div class="container col-12 rounded text-center bg-transparent py-1">
       <input
+        disabled
         type="time"
         step="1"
         class="form-control totalTime-field mx-auto px-2 shadow-sm lighter-bg clockText text-center"

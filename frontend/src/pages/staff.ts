@@ -135,6 +135,14 @@ function inspectUser(user: UserDTO): HTMLElement {
   body.innerHTML = `
     <div class="card profile-card w-100 shadow-sm border-0">
       <div class="card-body fs-5">
+      <div class="info-row d-flex justify-content-between border-bottom py-3">
+        <span class="label text-muted fw-medium">First Name</span>
+        <span class="value fw-semibold" data-field="profile.firstName">${user.profile?.firstName || 'N/A'}</span>
+      </div>
+      <div class="info-row d-flex justify-content-between border-bottom py-3">
+        <span class="label text-muted fw-medium">Last Name</span>
+        <span class="value fw-semibold" data-field="profile.lastName">${user.profile?.lastName || 'N/A'}</span>
+      </div>
         <div class="info-row d-flex justify-content-between border-bottom py-3">
           <span class="label text-muted fw-medium">Display Name</span>
           <span class="value fw-semibold" data-field="profile.displayName">${user.profile?.displayName || 'N/A'}</span>

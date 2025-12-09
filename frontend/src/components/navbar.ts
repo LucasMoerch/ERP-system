@@ -1,6 +1,7 @@
 import { navigate } from '../main';
 import { renderLogoNavbar } from './logoComponent/logo';
 import { renderLogoutButton } from './logoutButtonComponent/logoutButton';
+import { isAdmin } from '../auth/auth';
 
 export function getPageTitle(path: string): string {
   switch (path) {
@@ -75,11 +76,14 @@ export function renderHeaderAndNavbar(): HTMLElement {
 
   // Menu items
   const menuItems: { label: string; page: string; icon: string }[] = [
-    { label: 'Dashboard', page: 'dashboard', icon: '<i class="fa-solid fa-house"></i>' },
-    { label: 'Staff', page: 'staff', icon: '<i class="fa-solid fa-clipboard-user"></i>' },
-    { label: 'Clients', page: 'clients', icon: '<i class="fa-solid fa-users"></i>' },
-    { label: 'Cases', page: 'cases', icon: '<i class="fa-solid fa-suitcase"></i>' },
-    { label: 'My Profile', page: 'myProfile', icon: '<i class="fa-solid fa-user"></i>' },
+    {label: 'Dashboard', page: 'dashboard', icon: '<i class="fa-solid fa-house"></i>'},
+    // Only show Staff page if admin
+    ...(isAdmin() ? [
+      {label: 'Staff', page: 'staff', icon: '<i class="fa-solid fa-clipboard-user"></i>'}
+    ] : []),
+    {label: 'Clients', page: 'clients', icon: '<i class="fa-solid fa-users"></i>'},
+    {label: 'Cases', page: 'cases', icon: '<i class="fa-solid fa-suitcase"></i>'},
+    {label: 'My Profile', page: 'myProfile', icon: '<i class="fa-solid fa-user"></i>'},
   ];
 
   menuItems.forEach((item) => {

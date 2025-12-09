@@ -152,9 +152,8 @@ function inspectUser(user: any): HTMLElement {
         </div>
         <div class="info-row d-flex justify-content-between py-3">
           <span class="label text-muted fw-medium">Roles</span>
-          <span class="value fw-semibold" data-field="roles" data-transform="commaList">${
-            Array.isArray(user.roles) ? user.roles.join(', ') : user.roles || 'N/A'
-          }</span>
+          <span class="value fw-semibold" data-field="roles" data-transform="commaList">${Array.isArray(user.roles) ? user.roles.join(', ') : user.roles || 'N/A'
+    }</span>
         </div>
       </div>
     </div>
@@ -185,7 +184,6 @@ export function renderStaffPage(): HTMLElement {
   searchAndButtonContainer.style.display = 'flex';
   searchAndButtonContainer.style.justifyContent = 'flex-start';
   searchAndButtonContainer.style.alignItems = 'center';
-  searchAndButtonContainer.style.marginBottom = '20px';
 
   const searchEl = renderSearchComponent((query) => {
     const rows = realDataSection.querySelectorAll('tr');

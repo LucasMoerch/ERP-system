@@ -25,13 +25,18 @@ export function renderAddNewStaffCard(
   const emailField = createFloatingInput('staffEmail', 'Email *', 'email');
   const addressField = createFloatingInput('staffAddress', 'Address', 'text');
   const cprField = createFloatingInput('staffCpr', 'CPR *', 'tel');
-  const descField = createFloatingTextarea('staffDesc', 'Description', 4);
 
   const adminCheckWrapper = document.createElement('div');
-  adminCheckWrapper.className = 'form-check mb-3';
+  adminCheckWrapper.className = 'd-flex gap-3 mb-3';
   adminCheckWrapper.innerHTML = `
-    <input type="checkbox" class="form-check-input" id="isAdmin" />
-    <label class="form-check-label" for="isAdmin">Admin access</label>
+    <div class="form-check">
+      <input type="checkbox" class="form-check-input" id="isStaff" checked />
+      <label class="form-check-label" for="isStaff">Staff access</label>
+    </div>
+    <div class="form-check">
+      <input type="checkbox" class="form-check-input" id="isAdmin" />
+      <label class="form-check-label" for="isAdmin">Admin access</label>
+    </div>
     `;
 
   formContainer.appendChild(nameField);
@@ -39,7 +44,6 @@ export function renderAddNewStaffCard(
   formContainer.appendChild(emailField);
   formContainer.appendChild(addressField);
   formContainer.appendChild(cprField);
-  formContainer.appendChild(descField);
   formContainer.appendChild(adminCheckWrapper);
 
   // BUTTON ROW
@@ -76,8 +80,8 @@ export function renderAddNewStaffCard(
   const emailInput = formContainer.querySelector('#staffEmail') as HTMLInputElement;
   const addressInput = formContainer.querySelector('#staffAddress') as HTMLInputElement;
   const cprInput = formContainer.querySelector('#staffCpr') as HTMLInputElement;
+  const isStaffInput = formContainer.querySelector('#isStaff') as HTMLInputElement;
   const isAdminInput = formContainer.querySelector('#isAdmin') as HTMLInputElement;
-  const descInput = formContainer.querySelector('#staffDesc') as HTMLTextAreaElement;
 
   // CPR formatting (xxxxxx-xxxx)
   cprInput.addEventListener('input', () => {
@@ -101,8 +105,8 @@ export function renderAddNewStaffCard(
   phoneInput.addEventListener('input', () => markTypedInput(phoneInput));
   emailInput.addEventListener('input', () => markTypedInput(emailInput));
   addressInput.addEventListener('input', () => markTypedInput(addressInput));
+  isStaffInput.addEventListener('input', () => markTypedInput(isStaffInput));
   isAdminInput.addEventListener('input', () => markTypedInput(isAdminInput));
-  descInput.addEventListener('input', () => markTypedInput(descInput));
 
   cancelBtn.addEventListener('click', () => {
     if (isTyped) {
@@ -118,10 +122,12 @@ export function renderAddNewStaffCard(
     const email = emailInput.value.trim();
     const address = addressInput.value.trim();
     const cpr = cprInput.value.trim();
-    const desc = descInput.value.trim();
+    const isStaff = isStaffInput.checked;
     const isAdmin = isAdminInput.checked;
 
-    const role: UserRole = isAdmin ? 'admin' : 'staff';
+    const roles: UserRole[] = [];
+    if (isStaff) roles.push('staff');
+    if (isAdmin) roles.push('admin');
 
     // Reset all invalid states
     nameInput.classList.remove('is-invalid');
@@ -152,7 +158,7 @@ export function renderAddNewStaffCard(
       return;
     }
 
-    console.log('Submitting:', { name, phone, email, address, cpr, desc, role });
+    console.log('Submitting:', { name, phone, email, address, cpr, roles });
 
     if (!onInvite) {
       console.warn('No invite callback provided.');
@@ -160,7 +166,7 @@ export function renderAddNewStaffCard(
       return;
     }
 
-    const success = await onInvite(email, [role]);
+    const success = await onInvite(email, roles);
     if (success) {
       overlay.remove();
 

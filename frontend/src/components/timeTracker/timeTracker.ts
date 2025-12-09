@@ -304,17 +304,17 @@ export function renderTimeTracker(): HTMLElement {
     buttonRow.id = 'buttonRow';
 
     const startTimeBtn = document.createElement('button');
-    startTimeBtn.className = 'btn btn-success shadow col-4 rounded-pill ms-4';
+    startTimeBtn.className = 'btn btn-success col-12 shadow rounded-pill';
     startTimeBtn.innerText = 'Start Time';
     startTimeBtn.id = 'startTimeBtn';
 
     const stopTimeBtn = document.createElement('button');
-    stopTimeBtn.className = 'btn btn-danger shadow col-4 rounded-pill ms-4';
+    stopTimeBtn.className = 'btn btn-danger shadow col-12 rounded-pill';
     stopTimeBtn.innerText = 'Stop Time';
     stopTimeBtn.id = 'stopTimeBtn';
 
     const completeBtn: HTMLButtonElement = document.createElement('button');
-    completeBtn.className = 'btn btn-primary shadow col-4 rounded-pill ms-4';
+    completeBtn.className = 'btn btn-primary shadow col-12 rounded-pill';
     completeBtn.innerText = 'Complete';
 
     const startStopTimeRow: HTMLDivElement = document.createElement('div');
@@ -326,7 +326,7 @@ export function renderTimeTracker(): HTMLElement {
       <input
         type="time"
         step="1"
-        class="form-control mx-auto px-2 shadow-sm lighter-bg clockText text-center"
+        class="form-control mx-auto px-0 shadow-sm lighter-bg clockText text-center"
         id="startTime"
         value="00:00:00">
       </div>

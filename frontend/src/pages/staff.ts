@@ -131,10 +131,13 @@ function inspectUser(user: UserDTO): HTMLElement {
   const overlay: HTMLElement = renderCard({ edit: true, endpoint: 'users', data: user });
   const card: HTMLElement = overlay.querySelector('.card') as HTMLElement;
   const header: HTMLElement = card.querySelector('.header') as HTMLElement;
+  const titleEl = header.querySelector('h2') as HTMLElement | null;
   const body: HTMLElement = card.querySelector('.body') as HTMLElement;
 
-  header.innerText = user.profile?.displayName || 'No Name';
-
+  if (titleEl) {
+    titleEl.innerText = user.profile?.displayName || 'No Name';
+    titleEl.title = titleEl.innerText;
+  }
   // This is the body where the information is displayed like mail, mobile number etc.
   body.innerHTML = `
     <div class="card profile-card w-100 shadow-sm border-0">

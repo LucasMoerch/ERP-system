@@ -85,12 +85,9 @@ export function renderMyProfilePage(): HTMLElement {
     `;
 
 
-  const profileFooter = document.createElement('div');
-  profileFooter.className = 'card-footer bg-transparent border-0 pt-0 d-flex justify-content-end';
-
   const editButton = document.createElement('button');
   editButton.className = 'btn btn-outline-primary btn-sm';
-  editButton.textContent = 'Edit';
+  editButton.innerHTML = '<i class="fa-solid fa-pen-to-square"></i>';
 
   const displayNameEl = profileBody.querySelector(
     '#displayNameValue',
@@ -201,9 +198,8 @@ export function renderMyProfilePage(): HTMLElement {
 
 
 
-  profileFooter.appendChild(editButton);
+  profileCard.appendChild(editButton);
   profileCard.appendChild(profileBody);
-  profileCard.appendChild(profileFooter);
   profileCol.appendChild(profileCard);
   row.appendChild(profileCol);
 

@@ -53,6 +53,25 @@ function isInCurrentMonth(entry: TimeEntry): boolean {
   return year === currentYear && month === currentMonth;
 }
 
+function getMonthKey(entry: TimeEntry): string | null {
+  const [dayStr, monthStr, yearStr] = entry.date.split('-');
+  const day = Number(dayStr);
+  const month = Number(monthStr);
+  const year = Number(yearStr);
+  if (!day || !month || !year) return null;
+  return `${year.toString().padStart(4, '0')}-${month
+    .toString()
+    .padStart(2, '0')}`;
+}
+
+function formatMonthLabel(monthKey: string): string {
+  const [yearStr, monthStr] = monthKey.split('-');
+  const year = Number(yearStr);
+  const month = Number(monthStr);
+  const d = new Date(year, month - 1, 1);
+  return d.toLocaleDateString('da-DK', { month: 'long', year: 'numeric' });
+}
+
 export async function loadTimeEntries(config: TimeTabConfig) {
   const { entityType, entityId, container } = config;
 
@@ -93,7 +112,7 @@ function renderTimeList(entries: TimeEntry[], entityType: EntityType) {
     return bTime - aTime; // descending: newest first
   });
 
-  // CASES: total hours over all registrations, no month/overtime logic
+  // Cases: total hours over all registrations, no month/overtime logic
   if (entityType === 'cases') {
     let totalMinutes = 0;
 
@@ -145,7 +164,7 @@ function renderTimeList(entries: TimeEntry[], entityType: EntityType) {
               : ''
             }
               </li>
-            `
+            `,
         )
         .join('')}
         </ul>
@@ -153,80 +172,109 @@ function renderTimeList(entries: TimeEntry[], entityType: EntityType) {
     `;
   }
 
-  // STAFF: existing month + overtime logic
-  const monthlyEntries = sorted.filter(isInCurrentMonth);
+  // staff: existing month + overtime logic
+  const byMonth = new Map<string, TimeEntry[]>();
 
-  let regularMinutesTotal = 0;
-  let overtimeMinutesTotal = 0;
-
-  monthlyEntries.forEach((t) => {
-    const start = timeToMinutes(t.startTime);
-    const stop = timeToMinutes(t.stopTime);
-    if (isNaN(start) || isNaN(stop) || stop <= start) return;
-
-    const total = stop - start;
-    const overtime = Math.max(0, stop - Math.max(start, OVERTIME_START_MINUTES));
-    const regular = Math.max(0, total - overtime);
-
-    regularMinutesTotal += regular;
-    overtimeMinutesTotal += overtime;
+  sorted.forEach((t) => {
+    const key = getMonthKey(t);
+    if (!key) return;
+    if (!byMonth.has(key)) byMonth.set(key, []);
+    byMonth.get(key)!.push(t);
   });
 
-  const regularTotalStr = minutesToHHMM(regularMinutesTotal);
-  const overtimeTotalStr = minutesToHHMM(overtimeMinutesTotal);
-
-  return `
-    <div class="card bg-card-bg border-0 shadow-sm mt-3">
-      <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <div>
-          <span class="fw-semibold">Time registrations (this month)</span>
-          <span class="badge bg-secondary text-primary ms-2">${monthlyEntries.length}</span>
-        </div>
-        <div class="d-flex gap-2">
-          <span class="badge bg-success">Normal: ${regularTotalStr}</span>
-          <span class="badge bg-warning text-dark">Overtime (after 15:00): ${overtimeTotalStr}</span>
+  if (byMonth.size === 0) {
+    return `
+      <div class="card bg-card-bg border-0 shadow-sm mt-3">
+        <div class="card-body text-center text-muted py-4">
+          No time registrations yet.
         </div>
       </div>
-      <ul class="list-group list-group-flush time-list">
-        ${sorted
-      .map((t) => {
-        const inCurrentMonth = isInCurrentMonth(t);
-        return `
-              <li class="list-group-item bg-transparent time-list-item ${inCurrentMonth ? '' : 'time-list-item--inactive'
-          }">
-                <div class="d-flex justify-content-between flex-wrap gap-2">
-                  <div class="time-main">
-                    <div class="fw-semibold">
-                      <i class="fa-regular fa-clock me-1"></i>
-                      ${t.date} · ${t.startTime}–${t.stopTime}
+    `;
+  }
+
+  const monthKeys = Array.from(byMonth.keys()).sort((a, b) => b.localeCompare(a));
+
+  const monthSections = monthKeys
+    .map((key) => {
+      const monthEntries = byMonth.get(key)!;
+
+      let regularMinutesTotal = 0;
+      let overtimeMinutesTotal = 0;
+
+      monthEntries.forEach((t) => {
+        const start = timeToMinutes(t.startTime);
+        const stop = timeToMinutes(t.stopTime);
+        if (isNaN(start) || isNaN(stop) || stop <= start) return;
+
+        const total = stop - start;
+        const overtime = Math.max(0, stop - Math.max(start, OVERTIME_START_MINUTES));
+        const regular = Math.max(0, total - overtime);
+
+        regularMinutesTotal += regular;
+        overtimeMinutesTotal += overtime;
+      });
+
+      const regularTotalStr = minutesToHHMM(regularMinutesTotal);
+      const overtimeTotalStr = minutesToHHMM(overtimeMinutesTotal);
+      const monthLabel = formatMonthLabel(key);
+
+      return `
+        <div class="card bg-card-bg border-0 shadow-sm mt-3">
+          <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="flex-grow-1 me-2">
+              <span class="fw-semibold d-block text-truncate">
+                Time registrations · ${monthLabel}
+              </span>
+              <span class="badge bg-secondary text-primary mt-1">
+                ${monthEntries.length}
+              </span>
+            </div>
+            <div class="d-flex flex-wrap justify-content-end gap-2 flex-shrink-1">
+              <span class="badge bg-success text-wrap">
+                Normal: ${regularTotalStr}
+              </span>
+              <span class="badge bg-warning text-dark text-wrap">
+                Overtime<span class="d-none d-sm-inline"> (after 15:00)</span>: ${overtimeTotalStr}
+              </span>
+            </div>
+          </div>
+          <ul class="list-group list-group-flush time-list">
+            ${monthEntries
+          .map(
+            (t) => `
+                  <li class="list-group-item bg-transparent time-list-item">
+                    <div class="d-flex justify-content-between flex-wrap gap-2">
+                      <div class="time-main">
+                        <div class="fw-semibold">
+                          <i class="fa-regular fa-clock me-1"></i>
+                          ${t.date} · ${t.startTime}–${t.stopTime}
+                        </div>
+                        <div class="small text-muted">
+                          ${t.userName}${t.caseId ? ` · Case: ${t.caseId}` : ''}
+                        </div>
+                      </div>
+                      <div class="text-end">
+                        <span class="badge bg-primary rounded-pill">
+                          ${t.totalTime}
+                        </span>
+                      </div>
                     </div>
-                    <div class="small text-muted">
-                      ${t.userName}${t.caseId ? ` · Case: ${t.caseId}` : ''}
-                    </div>
-                    ${inCurrentMonth
-            ? ''
-            : `<div class="small text-muted fst-italic">
-                             Not counted in this month's total
+                    ${t.description
+                ? `<div class="mt-2 small text-body-secondary">
+                             ${t.description}
                            </div>`
-          }
-                  </div>
-                  <div class="text-end">
-                    <span class="badge bg-primary rounded-pill">
-                      ${t.totalTime}
-                    </span>
-                  </div>
-                </div>
-                ${t.description
-            ? `<div class="mt-2 small text-body-secondary">
-                         ${t.description}
-                       </div>`
-            : ''
-          }
-              </li>
-            `;
-      })
-      .join('')}
-      </ul>
-    </div>
-  `;
+                : ''
+              }
+                  </li>
+                `,
+          )
+          .join('')}
+          </ul>
+        </div>
+      `;
+
+    })
+    .join('');
+
+  return monthSections;
 }

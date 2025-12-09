@@ -84,14 +84,11 @@ export function renderMyProfilePage(): HTMLElement {
       </div>
     `;
 
-
   const editButton = document.createElement('button');
   editButton.className = 'btn btn-outline-primary btn-sm';
   editButton.innerHTML = '<i class="fa-solid fa-pen-to-square"></i>';
 
-  const displayNameEl = profileBody.querySelector(
-    '#displayNameValue',
-  ) as HTMLElement | null;
+  const displayNameEl = profileBody.querySelector('#displayNameValue') as HTMLElement | null;
 
   let isEditing = false;
 
@@ -195,8 +192,6 @@ export function renderMyProfilePage(): HTMLElement {
       alert('Failed to save profile. Please try again.');
     }
   });
-
-
 
   profileCard.appendChild(editButton);
   profileCard.appendChild(profileBody);

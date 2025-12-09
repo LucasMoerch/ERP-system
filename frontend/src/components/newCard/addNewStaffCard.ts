@@ -22,7 +22,8 @@ export function renderAddNewStaffCard(
 
   //Use the new reusable floating label helpers
   const firstNameField = createFloatingInput('staffFirstName', 'First Name *', 'text');
-  const lastNameField = createFloatingInput('staffLastName', 'Last Name *', 'text'); const phoneField = createFloatingInput('staffPhone', 'Mobile Number', 'tel');
+  const lastNameField = createFloatingInput('staffLastName', 'Last Name *', 'text');
+  const phoneField = createFloatingInput('staffPhone', 'Mobile Number', 'tel');
   const emailField = createFloatingInput('staffEmail', 'Email *', 'email');
   const addressField = createFloatingInput('staffAddress', 'Address', 'text');
   const cprField = createFloatingInput('staffCpr', 'CPR *', 'tel');

@@ -39,7 +39,6 @@ export function renderLoginPage(): HTMLElement {
     </div>
   `;
 
-
   // load GIS script once
   function ensureGisLoaded() {
     if (document.querySelector('script[src*="gsi/client"]')) return;

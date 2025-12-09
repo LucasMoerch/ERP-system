@@ -32,12 +32,10 @@ export function renderHomePage(): HTMLElement {
     <p class="fs-6 text-muted mb-0">This week</p>
   `;
 
-
   hoursContainer.appendChild(hours_worked);
   cardsContainer.appendChild(hoursContainer);
 
   if (isAdmin()) {
-
     //Card for when you want to create a new case.
     const create_new_container = document.createElement('div');
     create_new_container.className = 'create-new-container';
@@ -57,7 +55,6 @@ export function renderHomePage(): HTMLElement {
 
     create_new_container.appendChild(create_new);
     cardsContainer.appendChild(create_new_container);
-
 
     create_new.addEventListener('click', (): void => {
       const newCaseCard = renderAddNewCaseCard();
@@ -114,17 +111,13 @@ export function renderHomePage(): HTMLElement {
 
       // Newest created first
       visibleCases.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
 
       active_cases_container.innerHTML = ''; // Clear old content
 
       visibleCases.forEach((c) => {
-        const assignedCount = Array.isArray(c.assignedUserIds)
-          ? c.assignedUserIds.length
-          : 0;
-
+        const assignedCount = Array.isArray(c.assignedUserIds) ? c.assignedUserIds.length : 0;
 
         const createdLabel = new Date(c.createdAt).toLocaleDateString('da-DK');
 
@@ -163,7 +156,6 @@ export function renderHomePage(): HTMLElement {
           </div>
         `;
 
-
         caseBtn.addEventListener('click', () => {
           const popup = inspectCase(c);
           document.body.appendChild(popup);
@@ -171,7 +163,6 @@ export function renderHomePage(): HTMLElement {
 
         active_cases_container.appendChild(caseBtn);
       });
-
     } catch (err) {
       console.error('Failed to fetch cases:', err);
     }
@@ -184,7 +175,6 @@ export function renderHomePage(): HTMLElement {
     loadHoursThisWeek();
   };
   return container;
-
 }
 
 async function loadHoursThisWeek() {

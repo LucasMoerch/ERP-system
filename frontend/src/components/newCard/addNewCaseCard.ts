@@ -123,8 +123,7 @@ export function renderAddNewCaseCard(): HTMLElement {
 
       const homePage = document.querySelector('.home-container') as any;
       if (homePage?.reload) {
-            homePage.reload();
-
+        homePage.reload();
       }
     } catch (err: any) {
       const msg = err?.response?.data?.message || err?.message || 'Failed to create case.';

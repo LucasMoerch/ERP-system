@@ -135,9 +135,9 @@ export function renderCard(options: RenderCardOptions = {}): HTMLElement {
           const initialRoles = Array.isArray(options.data?.roles)
             ? (options.data!.roles as string[])
             : (valueSpan.textContent || '')
-              .split(',')
-              .map((s) => s.trim())
-              .filter(Boolean);
+                .split(',')
+                .map((s) => s.trim())
+                .filter(Boolean);
 
           // fake "users" so we can reuse createCheckboxDropdown
           const fakeUsers = roleIds.map((id) => ({
@@ -272,12 +272,10 @@ export function renderCard(options: RenderCardOptions = {}): HTMLElement {
       editBtn.remove();
 
       const saveBtn = document.createElement('button');
-      saveBtn.className =
-        'btn btn-sm btn-primary d-flex align-items-center justify-content-center';
+      saveBtn.className = 'btn btn-sm btn-primary d-flex align-items-center justify-content-center';
       saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk me-1"></i><span>Save</span>';
 
       headerActions.appendChild(saveBtn);
-
 
       const setNestedValue = (target: Record<string, unknown>, path: string, value: unknown) => {
         const segments = path.split('.');
@@ -443,8 +441,6 @@ export function renderCard(options: RenderCardOptions = {}): HTMLElement {
       editBtn.disabled = true;
     });
   }
-
-
 
   const body = document.createElement('div');
   body.className = 'body';

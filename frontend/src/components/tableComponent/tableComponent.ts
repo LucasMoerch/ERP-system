@@ -1,4 +1,3 @@
-
 export function renderTable(data: Array<Record<string, unknown>>): HTMLElement {
   const tableContainer = document.createElement('div');
   tableContainer.classList.add('col-12');

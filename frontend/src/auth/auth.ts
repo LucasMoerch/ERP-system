@@ -30,7 +30,7 @@ let initPromise: Promise<Me | null> | null = null;
   try {
     const raw = sessionStorage.getItem(STORAGE_KEY);
     if (raw) me = JSON.parse(raw);
-  } catch { }
+  } catch {}
 })();
 
 function persist(): void {
@@ -69,7 +69,7 @@ export function userId() {
   return me?.id ?? null;
 }
 export function getMe() {
-  console.log("getMe called, me:", me);
+  console.log('getMe called, me:', me);
   return me;
 }
 export function getDisplayName() {
@@ -91,6 +91,6 @@ window.addEventListener('storage', (e) => {
   if (e.key === STORAGE_KEY) {
     try {
       me = e.newValue ? JSON.parse(e.newValue) : null;
-    } catch { }
+    } catch {}
   }
 });

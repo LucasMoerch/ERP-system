@@ -7,7 +7,6 @@ import { renderHeaderAndNavbar } from './components/navbar';
 import { getPageTitle } from './components/navbar';
 import { initAuth, isAuthenticated } from './auth/auth';
 
-
 function render() {
   const app = document.getElementById('app')! as HTMLElement;
   app.innerHTML = ''; // clear old content

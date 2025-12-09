@@ -110,7 +110,7 @@ export function inspectCase(c: CaseDto): HTMLElement {
 
     footer.appendChild(deleteBtn);
     card.appendChild(footer);
-  };
+  }
 
   return overlay;
 }

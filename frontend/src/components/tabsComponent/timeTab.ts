@@ -33,9 +33,7 @@ function timeToMinutes(t: string): number {
 function minutesToHHMM(totalMinutes: number): string {
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
-  return `${hours.toString().padStart(2, '0')}:${minutes
-    .toString()
-    .padStart(2, '0')}`;
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 }
 
 function isInCurrentMonth(entry: TimeEntry): boolean {
@@ -59,9 +57,7 @@ function getMonthKey(entry: TimeEntry): string | null {
   const month = Number(monthStr);
   const year = Number(yearStr);
   if (!day || !month || !year) return null;
-  return `${year.toString().padStart(4, '0')}-${month
-    .toString()
-    .padStart(2, '0')}`;
+  return `${year.toString().padStart(4, '0')}-${month.toString().padStart(2, '0')}`;
 }
 
 function formatMonthLabel(monthKey: string): string {
@@ -138,8 +134,8 @@ function renderTimeList(entries: TimeEntry[], entityType: EntityType) {
         </div>
         <ul class="list-group list-group-flush time-list">
           ${sorted
-        .map(
-          (t) => `
+            .map(
+              (t) => `
               <li class="list-group-item bg-transparent time-list-item">
                 <div class="d-flex justify-content-between flex-wrap gap-2">
                   <div class="time-main">
@@ -157,16 +153,17 @@ function renderTimeList(entries: TimeEntry[], entityType: EntityType) {
                     </span>
                   </div>
                 </div>
-                ${t.description
-              ? `<div class="mt-2 small text-body-secondary">
+                ${
+                  t.description
+                    ? `<div class="mt-2 small text-body-secondary">
                          ${t.description}
                        </div>`
-              : ''
-            }
+                    : ''
+                }
               </li>
             `,
-        )
-        .join('')}
+            )
+            .join('')}
         </ul>
       </div>
     `;
@@ -240,8 +237,8 @@ function renderTimeList(entries: TimeEntry[], entityType: EntityType) {
           </div>
           <ul class="list-group list-group-flush time-list">
             ${monthEntries
-          .map(
-            (t) => `
+              .map(
+                (t) => `
                   <li class="list-group-item bg-transparent time-list-item">
                     <div class="d-flex justify-content-between flex-wrap gap-2">
                       <div class="time-main">
@@ -259,20 +256,20 @@ function renderTimeList(entries: TimeEntry[], entityType: EntityType) {
                         </span>
                       </div>
                     </div>
-                    ${t.description
-                ? `<div class="mt-2 small text-body-secondary">
+                    ${
+                      t.description
+                        ? `<div class="mt-2 small text-body-secondary">
                              ${t.description}
                            </div>`
-                : ''
-              }
+                        : ''
+                    }
                   </li>
                 `,
-          )
-          .join('')}
+              )
+              .join('')}
           </ul>
         </div>
       `;
-
     })
     .join('');
 

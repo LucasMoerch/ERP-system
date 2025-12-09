@@ -27,12 +27,8 @@ export type UserDTO = {
     lastName?: string | null;
     displayName?: string | null;
     phone?: string | null;
-    locale?: string | null;
-  } | null;
-
-  staff?: {
-    employeeNo?: string | null;
-    hourlyRate?: number | null;
+    address?: string | null;
+    cpr?: string | null;
   } | null;
 
   audit?: {
@@ -127,7 +123,7 @@ async function loadStaff(realDataSection: HTMLElement) {
   }
 }
 
-function inspectUser(user: any): HTMLElement {
+function inspectUser(user: UserDTO): HTMLElement {
   const overlay: HTMLElement = renderCard({ edit: true, endpoint: 'users', data: user });
   const card: HTMLElement = overlay.querySelector('.card') as HTMLElement;
   const header: HTMLElement = card.querySelector('.header') as HTMLElement;
@@ -157,12 +153,22 @@ function inspectUser(user: any): HTMLElement {
         </div>
         <div class="info-row d-flex justify-content-between py-3">
           <span class="label text-muted fw-medium">CPR Number</span>
-          <span class="value fw-semibold" data-field="cpr">${user.profile?.cpr || 'N/A'}</span>
+          <span class="value fw-semibold" data-field="profile.cpr">${user.profile?.cpr || 'N/A'}</span>
         </div>
         <div class="info-row d-flex justify-content-between py-3">
           <span class="label text-muted fw-medium">Roles</span>
           <span class="value fw-semibold dropdown" data-field="roles" data-transform="commaList">${Array.isArray(user.roles) ? user.roles.join(', ') : user.roles || 'N/A'
     }</span>
+        </div>
+        <div class="info-row d-flex justify-content-between py-3">
+          <span class="label text-muted fw-medium">Status</span>
+          <span
+            class="value fw-semibold dropdown"
+            data-field="status"
+            data-options="active, invited, disabled"
+          >
+            ${user.status || 'N/A'}
+          </span>
         </div>
       </div>
     </div>
@@ -217,6 +223,8 @@ export function renderStaffPage(): HTMLElement {
       const staffData = (users ?? []).map((user) => ({
         name: user.profile?.displayName || user.auth.email,
         role: user.roles.join(', '),
+        status: user.status,
+        email: user.auth.email,
       }));
       // remove "loading..."
       realDataSection.innerHTML = '';

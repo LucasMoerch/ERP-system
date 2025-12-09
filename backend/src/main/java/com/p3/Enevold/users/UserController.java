@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 
 @RestController
@@ -56,6 +57,13 @@ public class UserController {
            var lowerEmail = email.toLowerCase();
 
            var user = repo.findByAuthEmail(lowerEmail).orElseThrow(() -> new IllegalStateException("Invite not found for email: " + lowerEmail));
+
+           // If disabled, block it
+           if ("disabled".equalsIgnoreCase(user.getStatus())) {
+                       return ResponseEntity.status(403).body(
+                           java.util.Map.of("error", "UserDisabled",
+                                            "message", "This account has been disabled. Contact an administrator."));
+                   }
 
            // If already active with a different sub, block it
            if (user.getAuth() != null && user.getAuth().getSub() != null && !user.getAuth().getSub().isBlank()) {
@@ -94,7 +102,8 @@ public class UserController {
 
     }
 
-    // Edit user details
+    // Edit user details (only by admin or self)
+    @PreAuthorize("hasRole('ADMIN') or #id == principal.userId")
     @PutMapping("/{id}")
       public ResponseEntity<User> putUser(@PathVariable String id, @RequestBody User body) {
       var existing = repo.findById(id).orElse(null);
@@ -182,5 +191,6 @@ public class UserController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> all() { return ResponseEntity.ok(repo.findAll()); }
 }

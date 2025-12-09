@@ -2,9 +2,10 @@ import { renderCard } from '../cardComponent/cardComponent';
 import { createFloatingInput, createFloatingTextarea } from '../floatingLabel/floatingLabel';
 import type { UserRole } from '../../pages/staff';
 import { showCancelConfirmation } from '../cancelPopUp/cancelPopUp';
+import type { InvitePayload } from '../../pages/staff';
 
 export function renderAddNewStaffCard(
-  onInvite?: (email: string, role: UserRole[]) => Promise<boolean>,
+  onInvite?: (payload: InvitePayload) => Promise<boolean>,
 ): HTMLElement {
   // Create overlay
   const overlay = renderCard({ edit: false, endpoint: 'users/create', hasChanges: () => isTyped });
@@ -166,7 +167,14 @@ export function renderAddNewStaffCard(
       return;
     }
 
-    const success = await onInvite(email, roles);
+    const success = await onInvite({
+      email,
+      roles,
+      fullName: name,
+      phone,
+      address,
+      cpr,
+    });
     if (success) {
       overlay.remove();
 

@@ -43,27 +43,34 @@ export type UserDTO = {
   } | null;
 };
 
+export type InvitePayload = {
+  email: string;
+  roles: UserRole[];
+  fullName?: string;
+  phone?: string;
+  address?: string;
+  cpr?: string;
+};
+
 /**
- * @param email The email of the user to invite.
- * @param roles The role to assign ('staff' and/or 'admin').
+ * @param payload All invite data (email, roles, and optional profile fields).
  * @returns The UserDTO object returned by the server.
  */
-async function inviteUser(email: string, role: UserRole[]): Promise<UserDTO> {
+async function inviteUser(payload: InvitePayload): Promise<UserDTO> {
   const url = '/admin/invite';
-  const data = { email, roles: role };
-  const response = (await http.post(url, data)) as UserDTO;
+  const response = (await http.post(url, payload)) as UserDTO;
   return response;
 }
 
 function setupInvitationHandler(realDataSection: HTMLElement) {
-  const handleInvite = async (email: string, roles: UserRole[]) => {
+  const handleInvite = async (payload: InvitePayload) => {
     try {
-      if (!email || !roles) {
+      if (!payload.email || !payload.roles || payload.roles.length === 0) {
         alert('Please provide both email and role.');
         return false;
       }
 
-      const newUser = await inviteUser(email, roles); // Pass role as an array
+      const newUser = await inviteUser(payload);
       alert(
         `Invitation sent successfully to ${newUser.auth.email} with role(s): ${newUser.roles.join(
           ', ',
@@ -77,12 +84,13 @@ function setupInvitationHandler(realDataSection: HTMLElement) {
       const message =
         (err as any).response?.data?.message || 'Failed to send invitation. Check server logs.';
       alert(`Invitation failed: ${message}`);
-      return false; // Keep the form/card open on failure
+      return false;
     }
   };
 
   return handleInvite;
 }
+
 
 // loadStaff takes realDataSection as an argument to be refreshable
 async function loadStaff(realDataSection: HTMLElement) {

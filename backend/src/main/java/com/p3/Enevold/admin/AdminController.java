@@ -69,18 +69,12 @@ public class AdminController {
                 User.Profile profile = user.getProfile();
 
                 // Map extra fields from request
-                if (request.getFullName() != null && !request.getFullName().isBlank()) {
-                    profile.setDisplayName(request.getFullName());
-                }
-                if (request.getPhone() != null && !request.getPhone().isBlank()) {
-                    profile.setPhone(request.getPhone());
-                }
-                if (request.getAddress() != null && !request.getAddress().isBlank()) {
-                    profile.setAddress(request.getAddress());
-                }
-                if (request.getCPR() != null && !request.getCPR().isBlank()) {
-                    profile.setCPR(request.getCPR());
-                }
+                profile.setFirstName(request.getFirstName());
+                profile.setLastName(request.getLastName());
+                profile.setDisplayName(request.getFullName());
+                profile.setPhone(request.getPhone());
+                profile.setAddress(request.getAddress());
+                profile.setCPR(request.getCPR());
 
                 if (!filteredRoles.isEmpty()) {
                     user.setRoles(filteredRoles);

@@ -42,7 +42,9 @@ export type UserDTO = {
 export type InvitePayload = {
   email: string;
   roles: UserRole[];
-  fullName?: string;
+  firstName: string;
+  lastName: string;
+  fullName: string;
   phone?: string;
   address?: string;
   cpr?: string;

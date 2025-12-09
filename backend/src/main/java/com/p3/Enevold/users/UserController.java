@@ -114,6 +114,18 @@ public class UserController {
       return ResponseEntity.ok(saved);
     }
 
+    // Delete user (only by admin)
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable String id) {
+        if (!repo.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        repo.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+
     // Upload a file/document to a specific user
     @PostMapping("/{userId}/uploadDocument")
     public ResponseEntity<String> uploadDocument(

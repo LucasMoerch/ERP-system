@@ -184,6 +184,39 @@ function inspectUser(user: UserDTO): HTMLElement {
     }),
   );
 
+  // delete user in edit mode
+  if (isAdmin()) {
+    const footer = document.createElement('div');
+    footer.className = 'd-flex justify-content-end gap-2 p-3';
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'btn btn-outline-danger';
+    deleteBtn.innerText = 'Delete user';
+
+    deleteBtn.addEventListener('click', async () => {
+      const confirmed = window.confirm(
+        `Are you sure you want to permanently delete ${user.profile?.displayName || user.auth.email}?`,
+      );
+      if (!confirmed) return;
+
+      try {
+        await http.delete(`/users/${user.id}`);
+        overlay.remove();
+
+        const staffPage = document.querySelector('.staff-page') as any;
+        if (staffPage?.reload) {
+          staffPage.reload();
+        }
+      } catch (err) {
+        console.error('Failed to delete user', err);
+        alert('Failed to delete user. Please try again.');
+      }
+    });
+
+    footer.appendChild(deleteBtn);
+    card.appendChild(footer);
+  }
+
   return overlay;
 }
 

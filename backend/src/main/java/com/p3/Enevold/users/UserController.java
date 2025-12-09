@@ -121,7 +121,9 @@ public class UserController {
         String displayName,
         String phone,
         String address,
-        String cpr
+        String cpr,
+        String bankReg,
+        String bankNumber
     ) {}
 
     @PreAuthorize("#id == principal.userId")
@@ -139,6 +141,8 @@ public class UserController {
         p.setPhone(req.phone());
         p.setAddress(req.address());
         p.setCPR(req.cpr());
+        p.setBankReg(req.bankReg());
+        p.setBankNumber(req.bankNumber());
 
         return ResponseEntity.ok(repo.save(user));
     }

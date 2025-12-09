@@ -50,6 +50,8 @@ public class MeController {
       response.put("birthdate", profile != null ? profile.getBirthDate() : "");
       response.put("cpr", profile != null ? profile.getCPR() : "");
       response.put("documents", documents != null ? documents : List.of());
+      response.put("bankReg", profile != null ? profile.getBankReg() : "");
+      response.put("bankNumber", profile != null ? profile.getBankNumber() : "");
 
       return ResponseEntity.ok(response);
   }

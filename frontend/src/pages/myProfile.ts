@@ -70,6 +70,14 @@ export function renderMyProfilePage(): HTMLElement {
         <span class="label text-muted fw-medium">Address</span>
         <span class="value fw-semibold text-end" data-field="address">${me.address || 'N/A'}</span>
       </div>
+      <div class="info-row d-flex justify-content-between border-bottom py-2">
+        <span class="label text-muted fw-medium">Bank Reg.</span>
+        <span class="value fw-semibold text-end" data-field="bankReg">${me.bankReg || 'N/A'}</span>
+      </div>
+      <div class="info-row d-flex justify-content-between border-bottom py-2">
+        <span class="label text-muted fw-medium">Bank Number</span>
+        <span class="value fw-semibold text-end" data-field="bankNumber">${me.bankNumber || 'N/A'}</span>
+      </div>
       <div class="info-row d-flex justify-content-between py-2">
         <span class="label text-muted fw-medium">Status</span>
         <span class="value fw-semibold" data-field="status">${me.status || 'N/A'}</span>
@@ -159,6 +167,8 @@ export function renderMyProfilePage(): HTMLElement {
         phone: updated.phone,
         address: updated.address,
         cpr: updated.cpr,
+        bankReg: updated.bankReg,
+        bankNumber: updated.bankNumber,
       });
 
       // Refresh /me and sessionStorage so future getMe() sees new values

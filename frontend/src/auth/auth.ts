@@ -14,6 +14,8 @@ export interface Me {
   cpr?: string;
   phone?: string;
   address?: string;
+  bankReg?: string;
+  bankNumber?: string;
   documents?: any[];
   createdAt?: string;
   updatedAt?: string;

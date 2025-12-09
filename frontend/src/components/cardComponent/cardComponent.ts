@@ -99,6 +99,39 @@ export function renderCard(options: RenderCardOptions = {}): HTMLElement {
         if (!field || valueSpan.dataset.editable === 'false') return;
         if (valueSpan.querySelector('[data-edit-widget]')) return;
 
+        // Use checkbox dropdown for roles
+        if (field === 'roles') {
+          // allowed roles
+          const roleIds = ['staff', 'admin'];
+
+          // initial selection from data or from text "staff, admin"
+          const initialRoles = Array.isArray(options.data?.roles)
+            ? (options.data!.roles as string[])
+            : (valueSpan.textContent || '')
+              .split(',')
+              .map((s) => s.trim())
+              .filter(Boolean);
+
+          // fake "users" so we can reuse createCheckboxDropdown
+          const fakeUsers = roleIds.map((id) => ({
+            id,
+            auth: { provider: 'google', email: id, emailVerified: false },
+            profile: { displayName: id.charAt(0).toUpperCase() + id.slice(1) },
+          })) as UserDTO[];
+
+          const { container, getSelectedIds } = createCheckboxDropdown(fakeUsers, initialRoles);
+
+          container.dataset.editWidget = 'roles';
+          container.dataset.field = field;
+
+          valueSpan.textContent = '';
+          valueSpan.appendChild(container);
+
+          // let save-handler read selected roles
+          (valueSpan as any).__getSelectedIds = getSelectedIds;
+          return;
+        }
+
         if (field === 'assignedUsers') {
           const users = preloaded.users || [];
           const assignedFromAttr = valueSpan.dataset.assignedIds

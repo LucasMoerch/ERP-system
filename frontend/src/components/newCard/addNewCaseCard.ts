@@ -120,6 +120,12 @@ export function renderAddNewCaseCard(): HTMLElement {
       if (casesPage?.reload) {
         casesPage.reload(); // reload the cases page
       }
+
+      const homePage = document.querySelector('.home-container') as any;
+      if (homePage?.reload) {
+            homePage.reload();
+
+      }
     } catch (err: any) {
       const msg = err?.response?.data?.message || err?.message || 'Failed to create case.';
       console.error('Error creating case:', err);

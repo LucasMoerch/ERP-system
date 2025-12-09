@@ -107,10 +107,10 @@ export function renderHomePage(): HTMLElement {
 
         caseBtn.innerHTML = `
               <div class="d-flex align-items-center justify-content-between mb-2">
-                <span class="fs-5 fw-semibold">${c.title}</span>
+                <span class="case-title fs-5 fw-semibold">${c.title}</span>
                 <i class="fa-solid fa-folder-open fs-5"></i>
               </div>
-              <p class="text-muted mb-1">${c.description || 'No description'}</p>
+              <p class="case-desc text-muted mb-1">${c.description || 'No description'}</p>
               <p class="fs-6 text-muted mb-0">Created: ${new Date(c.createdAt).toLocaleDateString('da-DK')}</p>
               `;
 
@@ -129,6 +129,8 @@ export function renderHomePage(): HTMLElement {
   }
 
   loadCases();
+  (container as any).reload = loadCases;
 
-  return container;
+
+    return container;
 }

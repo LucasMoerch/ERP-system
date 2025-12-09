@@ -1,4 +1,4 @@
-import { getMe } from '../auth/auth';
+import { getMe, initAuth } from '../auth/auth';
 import http from '../api/http';
 import { loadTimeEntries } from '../components/tabsComponent/timeTab';
 import { loadFiles } from '../components/tabsComponent/fileTab';
@@ -35,44 +35,47 @@ export function renderMyProfilePage(): HTMLElement {
   profileBody.className = 'card-body fs-6';
 
   profileBody.innerHTML = `
-    <div class="d-flex align-items-center mb-4 gap-3">
-      <img
-        src="${me.pictureUrl || ''}"
-        alt="Profile picture"
-        class="rounded-circle border"
-        style="width: 64px; height: 64px; object-fit: cover;"
-      />
-      <div>
-        <div class="fw-semibold fs-5">${me.displayName || 'No name'}</div>
-        <div class="text-muted small">${me.email || ''}</div>
+      <div class="d-flex align-items-center mb-4 gap-3">
+        <img
+          src="${me.pictureUrl || ''}"
+          alt="Profile picture"
+          class="rounded-circle border"
+          style="width: 64px; height: 64px; object-fit: cover;"
+        />
+        <div>
+          <div class="fw-semibold fs-5" id="displayNameValue" data-field="displayName">
+            ${me.displayName || 'No name'}
+          </div>
+          <div class="text-muted small">${me.email || ''}</div>
+        </div>
       </div>
-    </div>
 
-    <div class="info-row d-flex justify-content-between border-bottom py-2">
-      <span class="label text-muted fw-medium">First name</span>
-      <span class="value fw-semibold">${me.firstName || 'N/A'}</span>
-    </div>
-    <div class="info-row d-flex justify-content-between border-bottom py-2">
-      <span class="label text-muted fw-medium">Last name</span>
-      <span class="value fw-semibold">${me.lastName || 'N/A'}</span>
-    </div>
-    <div class="info-row d-flex justify-content-between border-bottom py-2">
-      <span class="label text-muted fw-medium">CPR</span>
-      <span class="value fw-semibold text-end">${me.cpr || 'N/A'}</span>
-    </div>
-    <div class="info-row d-flex justify-content-between border-bottom py-2">
-      <span class="label text-muted fw-medium">Phone</span>
-      <span class="value fw-semibold text-end">${me.phoneNumber || 'N/A'}</span>
-    </div>
-    <div class="info-row d-flex justify-content-between border-bottom py-2">
-      <span class="label text-muted fw-medium">Address</span>
-      <span class="value fw-semibold text-end">${me.address || 'N/A'}</span>
-    </div>
-    <div class="info-row d-flex justify-content-between py-2">
-      <span class="label text-muted fw-medium">Status</span>
-      <span class="value fw-semibold">${me.status || 'N/A'}</span>
-    </div>
-  `;
+      <div class="info-row d-flex justify-content-between border-bottom py-2">
+        <span class="label text-muted fw-medium">First name</span>
+        <span class="value fw-semibold" data-field="firstName">${me.firstName || 'N/A'}</span>
+      </div>
+      <div class="info-row d-flex justify-content-between border-bottom py-2">
+        <span class="label text-muted fw-medium">Last name</span>
+        <span class="value fw-semibold" data-field="lastName">${me.lastName || 'N/A'}</span>
+      </div>
+      <div class="info-row d-flex justify-content-between border-bottom py-2">
+        <span class="label text-muted fw-medium">CPR</span>
+        <span class="value fw-semibold text-end" data-field="cpr">${me.cpr || 'N/A'}</span>
+      </div>
+      <div class="info-row d-flex justify-content-between border-bottom py-2">
+        <span class="label text-muted fw-medium">Phone</span>
+        <span class="value fw-semibold text-end" data-field="phone">${me.phone || 'N/A'}</span>
+      </div>
+      <div class="info-row d-flex justify-content-between border-bottom py-2">
+        <span class="label text-muted fw-medium">Address</span>
+        <span class="value fw-semibold text-end" data-field="address">${me.address || 'N/A'}</span>
+      </div>
+      <div class="info-row d-flex justify-content-between py-2">
+        <span class="label text-muted fw-medium">Status</span>
+        <span class="value fw-semibold" data-field="status">${me.status || 'N/A'}</span>
+      </div>
+    `;
+
 
   const profileFooter = document.createElement('div');
   profileFooter.className = 'card-footer bg-transparent border-0 pt-0 d-flex justify-content-end';
@@ -81,22 +84,112 @@ export function renderMyProfilePage(): HTMLElement {
   editButton.className = 'btn btn-outline-primary btn-sm';
   editButton.textContent = 'Edit';
 
-  editButton.addEventListener('click', () => {
+  const displayNameEl = profileBody.querySelector(
+    '#displayNameValue',
+  ) as HTMLElement | null;
+
+  let isEditing = false;
+
+  editButton.addEventListener('click', async () => {
+    if (!isEditing) {
+      // ENTER EDIT MODE
+      isEditing = true;
+      editButton.textContent = 'Save';
+
+      // Make display name editable
+      if (displayNameEl && !displayNameEl.querySelector('input')) {
+        const current = displayNameEl.textContent?.trim() || '';
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = current;
+        input.className = 'form-control form-control-sm fw-semibold';
+        displayNameEl.textContent = '';
+        displayNameEl.appendChild(input);
+      }
+
+      // Make all info-row values editable except status
+      const infoRows = profileBody.querySelectorAll('.info-row');
+      infoRows.forEach((row) => {
+        const valueSpan = row.querySelector('.value') as HTMLElement | null;
+        if (!valueSpan) return;
+        if (valueSpan.dataset.field === 'status') return; // status not editable
+
+        if (!valueSpan.querySelector('input')) {
+          const currentValue = valueSpan.textContent?.trim() || '';
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.value = currentValue === 'N/A' ? '' : currentValue;
+          input.className = 'form-control text-end fw-semibold';
+          valueSpan.textContent = '';
+          valueSpan.appendChild(input);
+        }
+      });
+
+      return;
+    }
+
+    // Save
+    const updated: any = { ...me };
+
+    // Read displayName
+    if (displayNameEl) {
+      const inp = displayNameEl.querySelector('input') as HTMLInputElement | null;
+      if (inp) updated.displayName = inp.value.trim();
+    }
+
+    // Read editable fields from inputs
     const infoRows = profileBody.querySelectorAll('.info-row');
     infoRows.forEach((row) => {
       const valueSpan = row.querySelector('.value') as HTMLElement | null;
       if (!valueSpan) return;
-      if (!valueSpan.querySelector('input')) {
-        const currentValue = valueSpan.textContent?.trim() || '';
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.value = currentValue;
-        input.className = 'form-control text-end fw-semibold';
-        valueSpan.textContent = '';
-        valueSpan.appendChild(input);
-      }
+      const field = valueSpan.dataset.field;
+      if (!field || field === 'status') return;
+
+      const input = valueSpan.querySelector('input') as HTMLInputElement | null;
+      if (!input) return;
+
+      updated[field] = input.value.trim();
     });
+
+    try {
+      await http.put(`/users/${me.id}/profile`, {
+        firstName: updated.firstName,
+        lastName: updated.lastName,
+        displayName: updated.displayName,
+        phone: updated.phone,
+        address: updated.address,
+        cpr: updated.cpr,
+      });
+
+      // Refresh /me and sessionStorage so future getMe() sees new values
+      await initAuth(true);
+
+      // Re-render
+      displayNameEl!.textContent = updated.displayName || 'No name';
+      infoRows.forEach((row) => {
+        const valueSpan = row.querySelector('.value') as HTMLElement | null;
+        if (!valueSpan) return;
+        const field = valueSpan.dataset.field;
+        if (!field) return;
+
+        if (field === 'status') {
+          valueSpan.textContent = updated.status || 'N/A';
+          return;
+        }
+
+        const newVal = (updated as any)[field] || 'N/A';
+        valueSpan.textContent = newVal;
+      });
+
+      isEditing = false;
+      editButton.textContent = 'Edit';
+    } catch (e) {
+      console.error('Failed to save profile', e);
+      alert('Failed to save profile. Please try again.');
+    }
   });
+
+
 
   profileFooter.appendChild(editButton);
   profileCard.appendChild(profileBody);

@@ -264,10 +264,10 @@ export function renderStaffPage(): HTMLElement {
     try {
       const users = (await http.get('/users')) as UserDTO[];
       const staffData = (users ?? []).map((user) => ({
-        name: user.profile?.displayName || user.auth.email,
+        name: user.profile?.displayName,
         role: user.roles.join(', '),
         status: user.status,
-        email: user.auth.email,
+        email: user.auth?.email || 'N/A',
       }));
       // remove "loading..."
       realDataSection.innerHTML = '';

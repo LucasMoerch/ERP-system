@@ -102,8 +102,8 @@ public class UserController {
 
     }
 
-    // Edit user details (only by admin or self)
-    @PreAuthorize("hasRole('ADMIN') or #id == principal.userId")
+    // Edit user details (only by admin)
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
       public ResponseEntity<User> putUser(@PathVariable String id, @RequestBody User body) {
       var existing = repo.findById(id).orElse(null);
@@ -113,6 +113,36 @@ public class UserController {
       var saved = repo.save(body);
       return ResponseEntity.ok(saved);
     }
+
+    // Update own profile details
+    public record SelfProfileUpdateRequest(
+        String firstName,
+        String lastName,
+        String displayName,
+        String phone,
+        String address,
+        String cpr
+    ) {}
+
+    @PreAuthorize("#id == principal.userId")
+    @PutMapping("/{id}/profile")
+    public ResponseEntity<?> updateProfile(@PathVariable String id,
+                                           @RequestBody SelfProfileUpdateRequest req) {
+        var user = repo.findById(id).orElse(null);
+        if (user == null) return ResponseEntity.notFound().build();
+
+        if (user.getProfile() == null) user.setProfile(new User.Profile());
+        var p = user.getProfile();
+        p.setFirstName(req.firstName());
+        p.setLastName(req.lastName());
+        p.setDisplayName(req.displayName());
+        p.setPhone(req.phone());
+        p.setAddress(req.address());
+        p.setCPR(req.cpr());
+
+        return ResponseEntity.ok(repo.save(user));
+    }
+
 
     // Delete user (only by admin)
     @PreAuthorize("hasRole('ADMIN')")

@@ -12,7 +12,7 @@ export interface Me {
   roles?: Role[];
   status?: string;
   cpr?: string;
-  phoneNumber?: string;
+  phone?: string;
   address?: string;
   documents?: any[];
   createdAt?: string;
@@ -67,11 +67,14 @@ export function userId() {
   return me?.id ?? null;
 }
 export function getMe() {
+  console.log("getMe called, me:", me);
   return me;
 }
 export function getDisplayName() {
   return me?.displayName ?? null;
 }
+
+
 
 // For logout
 export function clearAuth() {

@@ -76,7 +76,9 @@ export function getDisplayName() {
   return me?.displayName ?? null;
 }
 
-
+export function isLoggedIn(): boolean {
+  return !!localStorage.getItem('authToken');
+}
 
 // For logout
 export function clearAuth() {

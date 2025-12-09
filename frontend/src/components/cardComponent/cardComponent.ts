@@ -213,7 +213,7 @@ export function renderCard(options: RenderCardOptions = {}): HTMLElement {
 
       const saveBtn = document.createElement('button');
       saveBtn.className =
-        'btn btn-sm btn-primary position-absolute top-0 end-0 my-4 mx-1 py-1 px-2';
+        'btn btn-sm btn-primary position-absolute top-0 end-0 my-4 mx-2 py-1 px-1';
       saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save';
 
       card.appendChild(saveBtn);
@@ -384,8 +384,11 @@ export function renderCard(options: RenderCardOptions = {}): HTMLElement {
   }
 
   const header = document.createElement('div');
-  header.className = 'header mt-4 text-center fw-semibold fs-3 ';
+  header.className =
+    'header mt-4 text-center fw-semibold fs-3 text-truncate px-4 w-100 d-block';
   header.innerText = 'placeholder';
+  header.title = header.innerText; // optional tooltip
+
 
   const body = document.createElement('div');
   body.className = 'body';

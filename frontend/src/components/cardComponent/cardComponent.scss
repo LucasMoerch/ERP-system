@@ -19,12 +19,13 @@
   }
 }
 
-.header {
-  padding: 0 4rem;
+.overlay .card .header {
+  max-width: calc(100% - 6rem);  /* 3rem left + 3rem right for buttons */
+  margin: 1.5rem auto 0;
   text-align: center;
-  text-overflow: hidden;
   white-space: nowrap;
-  display: block;
+  overflow: clip;
+  text-overflow: ellipsis;
 }
 
 .back-button {

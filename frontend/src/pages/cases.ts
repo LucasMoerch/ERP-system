@@ -39,7 +39,7 @@ export function inspectCase(c: CaseDto): HTMLElement {
             </div>
 
             <div class="info-row d-flex justify-content-between border-bottom py-3">
-              <span class="label text-muted fw-medium">Client ID</span>
+              <span class="label text-muted fw-medium">Client</span>
               <span
                 class="value dropdown fw-semibold"
                 data-field="clientId"
@@ -47,12 +47,6 @@ export function inspectCase(c: CaseDto): HTMLElement {
               >
                 ${c.clientId ? c.clientId : 'None'}
               </span>            </div>
-
-            <div class="info-row d-flex justify-content-between border-bottom py-3">
-              <span class="label text-muted fw-medium">Description</span>
-              <span class="value fw-semibold text-end" data-field="description">${c.description || '-'}</span>
-            </div>
-
             <div class="info-row d-flex justify-content-between border-bottom py-3">
               <span class="label text-muted fw-medium">Status</span>
               <span class="value dropdown fw-semibold" data-field="status" data-options="OPEN,ON_HOLD,CLOSED">${c.status}</span>

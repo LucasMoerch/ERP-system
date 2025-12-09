@@ -3,6 +3,7 @@ import { renderSearchComponent } from '../components/searchBar/searchBar';
 import { renderCard } from '../components/cardComponent/cardComponent';
 import http from '../api/http';
 import { renderTabs } from '../components/tabsComponent/tabsComponent';
+import { isAdmin } from '../auth/auth';
 
 export type CaseDto = {
   id: string;
@@ -79,6 +80,37 @@ export function inspectCase(c: CaseDto): HTMLElement {
   card.appendChild(
     renderTabs({ entityType: 'cases', entityId: c.id, description: c.description || '' }),
   );
+
+  // Delete button for admins
+  if (isAdmin()) {
+    const footer = document.createElement('div');
+    footer.className = 'd-flex justify-content-end gap-2 p-3';
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'btn btn-outline-danger delete-case-button';
+    deleteBtn.innerText = 'Delete case';
+
+    deleteBtn.addEventListener('click', async () => {
+      const confirmed = window.confirm(
+        `Are you sure you want to permanently delete case "${c.title}"?`,
+      );
+      if (!confirmed) return;
+
+      try {
+        await http.delete(`/cases/${c.id}`);
+        overlay.remove();
+
+        const casesPage = document.querySelector('.cases-page') as any;
+        if (casesPage?.reload) casesPage.reload();
+      } catch (err) {
+        console.error('Failed to delete case', err);
+        alert('Failed to delete case. Please try again.');
+      }
+    });
+
+    footer.appendChild(deleteBtn);
+    card.appendChild(footer);
+  };
 
   return overlay;
 }

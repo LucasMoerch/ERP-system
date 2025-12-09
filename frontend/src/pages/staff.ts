@@ -184,7 +184,7 @@ function inspectUser(user: UserDTO): HTMLElement {
     }),
   );
 
-  // delete user in edit mode
+  // delete user button for admins
   if (isAdmin()) {
     const footer = document.createElement('div');
     footer.className = 'd-flex justify-content-end gap-2 p-3';

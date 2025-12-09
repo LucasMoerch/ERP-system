@@ -3,6 +3,7 @@ import { renderTable } from '../components/tableComponent/tableComponent';
 import { renderCard } from '../components/cardComponent/cardComponent';
 import { renderTabs } from '../components/tabsComponent/tabsComponent';
 import http from '../api/http';
+import { isAdmin } from '../auth/auth';
 
 export type ClientDTO = {
   id: string;
@@ -101,6 +102,37 @@ export function renderClientsPage(): HTMLElement {
     `;
     card.appendChild(body);
     card.appendChild(renderTabs({ entityType: 'clients', entityId: client.id }));
+
+    // Delete button for admins
+    if (isAdmin()) {
+      const footer = document.createElement('div');
+      footer.className = 'd-flex justify-content-end gap-2 p-3';
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'btn btn-outline-danger delete-client-button';
+      deleteBtn.innerText = 'Delete client';
+
+      deleteBtn.addEventListener('click', async () => {
+        const confirmed = window.confirm(
+          `Are you sure you want to permanently delete client "${client.name}"?`,
+        );
+        if (!confirmed) return;
+
+        try {
+          await http.delete(`/clients/${client.id}`);
+          overlay.remove();
+
+          const clientsPage = document.querySelector('.clients-page') as any;
+          if (clientsPage?.reload) clientsPage.reload();
+        } catch (err) {
+          console.error('Failed to delete client', err);
+          alert('Failed to delete client. Please try again.');
+        }
+      });
+
+      footer.appendChild(deleteBtn);
+      card.appendChild(footer);
+    }
 
     return overlay;
   }

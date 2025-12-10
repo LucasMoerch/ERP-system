@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/clients")
@@ -46,9 +47,14 @@ public class ClientController {
   return ResponseEntity.ok(saved);
   }
 
-  @DeleteMapping("/deleteClient/{id}")
-  public void deleteClient(@PathVariable String id) {
-    clientRepository.deleteById(id);
+  @PreAuthorize("hasRole('ADMIN')")
+  @DeleteMapping("/{id}")
+  public ResponseEntity<?> deleteClient(@PathVariable String id) {
+      if (!clientRepository.existsById(id)) {
+          return ResponseEntity.notFound().build();
+      }
+      clientRepository.deleteById(id);
+      return ResponseEntity.noContent().build();
   }
 
   // Upload a file/document to a specific client

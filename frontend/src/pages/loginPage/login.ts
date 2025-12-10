@@ -19,18 +19,24 @@ export function renderLoginPage(): HTMLElement {
   container.className = 'container d-flex justify-content-center align-items-center vh-100';
 
   const card = document.createElement('div');
-  card.className = 'card p-5 login-card d-flex flex-column justify-content-center ';
-
-  console.log('RENDER LOGIN - CLIENT ID =', GOOGLE_CLIENT_ID);
+  card.className =
+    'card p-4 p-sm-5 login-card d-flex flex-column align-items-center justify-content-center text-center w-100';
+  (card as HTMLElement).style.maxWidth = '420px';
 
   const gContainer = document.createElement('div');
+  gContainer.className = 'w-100 d-flex justify-content-center mt-4';
   gContainer.innerHTML = `
     <div id="g_id_onload"
          data-client_id="${GOOGLE_CLIENT_ID}"
          data-callback="onGoogleCredential"
          data-auto_prompt="false">
     </div>
-    <div id="gBtn" class="g_id_signin" data-type="standard" data-size="large" data-theme="outline"></div>
+    <div id="gBtn"
+         class="g_id_signin"
+         data-type="standard"
+         data-size="large"
+         data-theme="outline">
+    </div>
   `;
 
   // load GIS script once
@@ -50,8 +56,8 @@ export function renderLoginPage(): HTMLElement {
       const data = await http.post('/users/activate', new URLSearchParams({ id_token }));
 
       // success
-      navigate('home');
       await initAuth(true);
+      navigate('home');
       document.body.style.backgroundImage = '';
     } catch (err: any) {
       // Axios errors, err.response?.data has server message

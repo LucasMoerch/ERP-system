@@ -66,10 +66,21 @@ public class AdminController {
                     user.setProfile(new User.Profile());
                 }
 
+                User.Profile profile = user.getProfile();
+
+                // Map extra fields from request
+                profile.setFirstName(request.getFirstName());
+                profile.setLastName(request.getLastName());
+                profile.setDisplayName(request.getFullName());
+                profile.setPhone(request.getPhone());
+                profile.setAddress(request.getAddress());
+                profile.setCPR(request.getCPR());
 
                 if (!filteredRoles.isEmpty()) {
                     user.setRoles(filteredRoles);
                 }
+
+
                 } else { // send error if already invited
                     return ResponseEntity.status(409)
                             .body(Map.of("error", "UserAlreadyActive",

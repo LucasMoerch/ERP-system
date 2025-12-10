@@ -46,6 +46,15 @@
   margin: 1.5rem 0.3rem 0.5rem 0.3rem;
 }
 
+.case-title,
+.case-desc {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  width: 100%;
+}
+
 .sort-by {
   font-size: 1.3rem;
   color: #333;

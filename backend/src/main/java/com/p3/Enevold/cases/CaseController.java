@@ -10,6 +10,7 @@ import com.p3.Enevold.utils.FileDocument;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/cases")
@@ -63,6 +64,17 @@ public class CaseController {
     var saved = repo.save(body);
     return ResponseEntity.ok(saved);
   }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @DeleteMapping("/{id}")
+  public ResponseEntity<?> deleteCase(@PathVariable String id) {
+      if (!repo.existsById(id)) {
+          return ResponseEntity.notFound().build();
+      }
+      repo.deleteById(id);
+      return ResponseEntity.noContent().build();
+  }
+
 
   // Upload a file/document to a specific case
   @PostMapping("/{caseId}/uploadDocument")

@@ -3,6 +3,7 @@ import http from '../api/http';
 import type { CaseDto } from './cases';
 import { renderAddNewCaseCard } from '../components/newCard/addNewCaseCard';
 import { inspectCase } from './cases';
+import { isAdmin, userId } from '../auth/auth';
 
 export function renderHomePage(): HTMLElement {
   const container = document.createElement('div');
@@ -16,52 +17,57 @@ export function renderHomePage(): HTMLElement {
 
   const hours_worked = document.createElement('button');
   hours_worked.className = `
-      card border-0 shadow-sm lighter-bg text-dark rounded p-3
-      d-flex flex-column justify-content-start gap-1 w-100
-      `;
+    card border-0 shadow-sm lighter-bg text-dark rounded p-3
+    d-flex flex-column justify-content-start gap-1 w-100
+  `;
   hours_worked.style.height = '130px';
   hours_worked.style.cursor = 'pointer';
 
   hours_worked.innerHTML = `
-      <div class="d-flex align-items-center mb-2" style="justify-content: space-around;"">
-        <span class="fs-large fw-semibold">16.5</span>
-        <i class="fa-regular fa-clock fs-big"></i>
-      </div>
-      <p class="fs-6 fw-medium mb-0">Hours worked</p>
-      <p class="fs-6 text-muted mb-0">This week</p>
-      `;
+    <div class="d-flex align-items-center mb-2 justify-content-around">
+      <span id="hoursThisWeekValue" class="fs-large fw-semibold">–</span>
+      <i class="fa-regular fa-clock fs-big"></i>
+    </div>
+    <p class="fs-6 fw-medium mb-0">Hours worked</p>
+    <p class="fs-6 text-muted mb-0">This week</p>
+  `;
 
   hoursContainer.appendChild(hours_worked);
   cardsContainer.appendChild(hoursContainer);
 
-  //Card for when you want to create a new case.
-  const create_new_container = document.createElement('div');
-  create_new_container.className = 'create-new-container';
+  if (isAdmin()) {
+    //Card for when you want to create a new case.
+    const create_new_container = document.createElement('div');
+    create_new_container.className = 'create-new-container';
 
-  const create_new = document.createElement('button');
-  create_new.className = `
+    const create_new = document.createElement('button');
+    create_new.className = `
       card border-0 shadow-sm lighter-bg text-dark rounded
       d-flex flex-column justify-content-center align-items-center
       w-100 p-3
       `;
-  create_new.style.height = '130px';
-  create_new.style.cursor = 'pointer';
+    create_new.style.height = '130px';
+    create_new.style.cursor = 'pointer';
 
-  create_new.innerHTML = `
+    create_new.innerHTML = `
       <i class="fa-solid fa-circle-plus fs-1"></i>
       `;
 
-  create_new_container.appendChild(create_new);
-  cardsContainer.appendChild(create_new_container);
+    create_new_container.appendChild(create_new);
+    cardsContainer.appendChild(create_new_container);
+
+    create_new.addEventListener('click', (): void => {
+      const newCaseCard = renderAddNewCaseCard();
+      document.body.appendChild(newCaseCard);
+      console.log('creating new case clicked');
+    });
+  } else {
+    // make hours container take full width when not admin
+    hoursContainer.style.flex = '0 0 100%';
+    hoursContainer.style.maxWidth = '100%';
+  }
 
   container.appendChild(cardsContainer);
-
-  create_new.addEventListener('click', (): void => {
-    const newCaseCard = renderAddNewCaseCard();
-    document.body.appendChild(newCaseCard);
-    console.log('creating new case clicked');
-  });
-
   //Text for active cases
   const headerRow = document.createElement('div');
   headerRow.className = 'cases-header';
@@ -81,9 +87,9 @@ export function renderHomePage(): HTMLElement {
 
   container.appendChild(headerRow);
 
-  //Creates the box to hold active tasks
   const active_cases_container = document.createElement('div');
-  active_cases_container.className = `d-flex flex-wrap justify-content-between align-items-start w-100 mt-3`;
+  active_cases_container.className =
+    'd-flex flex-wrap justify-content-between align-items-start w-100 mt-3';
   container.appendChild(active_cases_container);
 
   async function loadCases() {
@@ -91,34 +97,68 @@ export function renderHomePage(): HTMLElement {
       const cases = (await http.get('/cases')) as CaseDto[];
       console.log('Fetched cases:', cases);
 
-      // Only show active/open cases
-      const activeCases = cases.filter((c) => c.status === 'OPEN');
+      const meId = userId();
+
+      // Only OPEN cases
+      let visibleCases = (cases ?? []).filter((c) => c.status === 'OPEN');
+
+      // If not admin, only open cases assigned to current user
+      if (!isAdmin() && meId) {
+        visibleCases = visibleCases.filter((c) =>
+          Array.isArray(c.assignedUserIds) ? c.assignedUserIds.includes(meId) : false,
+        );
+      }
+
+      // Newest created first
+      visibleCases.sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
+
       active_cases_container.innerHTML = ''; // Clear old content
 
-      activeCases.forEach((c) => {
+      visibleCases.forEach((c) => {
+        const assignedCount = Array.isArray(c.assignedUserIds) ? c.assignedUserIds.length : 0;
+
+        const createdLabel = new Date(c.createdAt).toLocaleDateString('da-DK');
+
         const caseBtn = document.createElement('button');
+        caseBtn.type = 'button';
         caseBtn.className = `
-                card border-0 shadow-sm bg-white text-dark rounded p-3
-                d-flex flex-column justify-content-start gap-1 mb-3
-                `;
-        caseBtn.style.width = '48%';
-        caseBtn.style.height = '130px';
+          card border-0 shadow-sm bg-white text-dark rounded p-3
+          d-flex flex-column justify-content-between gap-2 mb-3 text-start
+        `;
+        caseBtn.style.flex = '0 0 calc(50% - 0.5rem)'; // two per row with small gap
         caseBtn.style.cursor = 'pointer';
+        caseBtn.style.overflow = 'hidden';
 
         caseBtn.innerHTML = `
-              <div class="d-flex align-items-center justify-content-between mb-2">
-                <span class="fs-5 fw-semibold">${c.title}</span>
-                <i class="fa-solid fa-folder-open fs-5"></i>
+          <div class="d-flex align-items-start justify-content-between mb-1 w-100">
+            <div class="me-2 flex-grow-1 overflow-hidden">
+              <div class="case-title fw-semibold text-truncate">
+                ${c.title}
               </div>
-              <p class="text-muted mb-1">${c.description || 'No description'}</p>
-              <p class="fs-6 text-muted mb-0">Created: ${new Date(c.createdAt).toLocaleDateString('da-DK')}</p>
-              `;
+              <div class="case-desc text-muted small text-truncate">
+                ${c.description || 'No description'}
+              </div>
+            </div>
+              <i class="fa-solid fa-folder-open"></i>
+          </div>
 
-        // When clicked, open the case popup
+          <div class="d-flex justify-content-between align-items-center small text-muted pt-1 w-100">
+            <span class="text-truncate">
+              <i class="fa-regular fa-calendar me-1"></i>
+              ${createdLabel}
+            </span>
+            <span class="text-truncate text-end">
+              <i class="fa-regular fa-user me-1"></i>
+              ${assignedCount}
+            </span>
+          </div>
+        `;
+
         caseBtn.addEventListener('click', () => {
           const popup = inspectCase(c);
           document.body.appendChild(popup);
-          console.log('Opened case:', c.id);
         });
 
         active_cases_container.appendChild(caseBtn);
@@ -129,6 +169,65 @@ export function renderHomePage(): HTMLElement {
   }
 
   loadCases();
-
+  loadHoursThisWeek();
+  (container as any).reload = () => {
+    loadCases();
+    loadHoursThisWeek();
+  };
   return container;
+}
+
+async function loadHoursThisWeek() {
+  try {
+    const meId = userId();
+    if (!meId) return;
+
+    // Compute this week from monday to sunday
+    const now = new Date();
+    const day = now.getDay();
+    const diffToMonday = (day + 6) % 7;
+    const monday = new Date(now);
+    monday.setHours(0, 0, 0, 0);
+    monday.setDate(now.getDate() - diffToMonday);
+
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23, 59, 59, 999);
+
+    type TimeDto = {
+      date?: string | null;
+      totalTime?: string | null;
+    };
+
+    const times = (await http.get(`/times/users/${meId}`)) as TimeDto[];
+
+    const totalSeconds = (times ?? []).reduce((sum, t) => {
+      if (!t.date || !t.totalTime) return sum;
+
+      // Parse date "dd-MM-yyyy"
+      const [dd, mm, yyyy] = t.date.split('-').map((s) => parseInt(s, 10));
+      if (!dd || !mm || !yyyy) return sum;
+      const d = new Date(yyyy, mm - 1, dd); // JS months are 0-based
+
+      if (d < monday || d > sunday) return sum;
+
+      // Parse totalTime "HH:MM:SS" to seconds
+      const [hhStr, minStr, ssStr] = t.totalTime.split(':');
+      const h = parseInt(hhStr ?? '0', 10);
+      const m = parseInt(minStr ?? '0', 10);
+      const s = parseInt(ssStr ?? '0', 10);
+      const seconds = h * 3600 + m * 60 + s;
+
+      return sum + (Number.isNaN(seconds) ? 0 : seconds);
+    }, 0);
+
+    const totalHours = totalSeconds / 3600;
+
+    const span = document.getElementById('hoursThisWeekValue');
+    if (span) {
+      span.textContent = totalHours.toFixed(1);
+    }
+  } catch (err) {
+    console.error('Failed to load hours this week:', err);
+  }
 }

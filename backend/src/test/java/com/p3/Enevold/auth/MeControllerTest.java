@@ -37,7 +37,7 @@ class MeControllerTest {
         ResponseEntity<?> response = controller.me(session);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue(response.getBody() instanceof Map);
+        assertInstanceOf(Map.class, response.getBody());
         Map<?, ?> body = (Map<?, ?>) response.getBody();
         assertEquals(false, body.get("authenticated"));
         verifyNoInteractions(repo);
@@ -51,7 +51,7 @@ class MeControllerTest {
         ResponseEntity<?> response = controller.me(session);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue(response.getBody() instanceof Map);
+        assertInstanceOf(Map.class, response.getBody());
         Map<?, ?> body = (Map<?, ?>) response.getBody();
         assertEquals(false, body.get("authenticated"));
         verify(repo).findById("user-1");
@@ -83,7 +83,7 @@ class MeControllerTest {
         ResponseEntity<?> response = controller.me(session);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue(response.getBody() instanceof Map);
+        assertInstanceOf(Map.class, response.getBody());
         Map<?, ?> body = (Map<?, ?>) response.getBody();
 
         assertEquals(true, body.get("authenticated"));
@@ -109,7 +109,7 @@ class MeControllerTest {
         assertEquals(updatedAt, body.get("updatedAt"));
 
         Object docsObj = body.get("documents");
-        assertTrue(docsObj instanceof List);
+        assertInstanceOf(List.class, docsObj);
         List<?> docsFromResponse = (List<?>) docsObj;
         assertEquals(1, docsFromResponse.size());
 
@@ -121,7 +121,7 @@ class MeControllerTest {
         ResponseEntity<?> response = controller.logout(session);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue(response.getBody() instanceof Map);
+        assertInstanceOf(Map.class, response.getBody());
         Map<?, ?> body = (Map<?, ?>) response.getBody();
         assertEquals(true, body.get("ok"));
         verify(session).invalidate();

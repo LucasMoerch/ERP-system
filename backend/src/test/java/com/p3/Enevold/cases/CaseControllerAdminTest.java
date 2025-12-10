@@ -32,7 +32,7 @@ class CaseControllerAdminTest {
         ResponseEntity<?> response = controller.deleteCase("123");
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertTrue(response.getBody() instanceof Map);
+        assertInstanceOf(Map.class, response.getBody());
         Map<?, ?> body = (Map<?, ?>) response.getBody();
         assertEquals("Case not found", body.get("error"));
         verify(repo, never()).deleteById(anyString());
@@ -46,7 +46,7 @@ class CaseControllerAdminTest {
         ResponseEntity<?> response = controller.deleteCase("123");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue(response.getBody() instanceof Map);
+        assertInstanceOf(Map.class, response.getBody());
         Map<?, ?> body = (Map<?, ?>) response.getBody();
         assertEquals("Case deleted successfully", body.get("message"));
         assertEquals("123", body.get("caseId"));
@@ -60,7 +60,7 @@ class CaseControllerAdminTest {
         ResponseEntity<?> response = controller.deleteCase("123");
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertTrue(response.getBody() instanceof Map);
+        assertInstanceOf(Map.class, response.getBody());
         Map<?, ?> body = (Map<?, ?>) response.getBody();
         assertEquals("db error", body.get("error"));
     }

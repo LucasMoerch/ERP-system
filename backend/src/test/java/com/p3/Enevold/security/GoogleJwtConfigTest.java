@@ -26,7 +26,7 @@ class GoogleJwtConfigTest {
         JwtDecoder decoder = config.googleJwtDecoder();
 
         assertNotNull(decoder);
-        assertTrue(decoder instanceof NimbusJwtDecoder);
+        assertInstanceOf(NimbusJwtDecoder.class, decoder);
     }
 
     @Test
@@ -39,8 +39,8 @@ class GoogleJwtConfigTest {
                 jwt.getAudience().contains(clientId)
                         ? OAuth2TokenValidatorResult.success()
                         : OAuth2TokenValidatorResult.failure(
-                                new OAuth2Error("invalid_token", "wrong audience", "")
-                        );
+                        new OAuth2Error("invalid_token", "wrong audience", "")
+                );
         OAuth2TokenValidator<Jwt> validator =
                 new DelegatingOAuth2TokenValidator<>(issuerValidator, audienceValidator);
 

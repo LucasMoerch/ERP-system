@@ -2,7 +2,6 @@ package com.p3.Enevold.time;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -52,7 +51,7 @@ class TimeControllerTest {
         );
 
         assertEquals(200, response.getStatusCode().value());
-        assertTrue(response.getBody() instanceof Time);
+        assertInstanceOf(Time.class, response.getBody());
         Time saved = (Time) response.getBody();
 
         assertEquals("09:00", saved.getStartTime());
@@ -74,7 +73,7 @@ class TimeControllerTest {
         );
 
         assertEquals(400, response.getStatusCode().value());
-        assertTrue(response.getBody() instanceof Map);
+        assertInstanceOf(Map.class, response.getBody());
         Map<?, ?> body = (Map<?, ?>) response.getBody();
         assertEquals("RuntimeException", body.get("error"));
     }
@@ -122,7 +121,7 @@ class TimeControllerTest {
         );
 
         assertEquals(200, response.getStatusCode().value());
-        assertTrue(response.getBody() instanceof Time);
+        assertInstanceOf(Time.class, response.getBody());
         Time saved = (Time) response.getBody();
 
         assertEquals("09:00", saved.getStartTime());

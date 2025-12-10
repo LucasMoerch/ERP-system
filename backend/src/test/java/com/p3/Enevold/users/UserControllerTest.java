@@ -3,7 +3,6 @@ package com.p3.Enevold.users;
 import com.p3.Enevold.utils.FileDocument;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -11,10 +10,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -72,7 +68,7 @@ class UserControllerTest {
 
         // Assert
         assertEquals(200, response.getStatusCode().value());
-        assertTrue(response.getBody() instanceof User);
+        assertInstanceOf(User.class, response.getBody());
         User saved = (User) response.getBody();
 
         assertEquals("active", saved.getStatus());
@@ -107,7 +103,7 @@ class UserControllerTest {
         var response = controller.activate("bad-token", session);
 
         assertEquals(400, response.getStatusCode().value());
-        assertTrue(response.getBody() instanceof java.util.Map);
+        assertInstanceOf(Map.class, response.getBody());
         var body = (java.util.Map<?, ?>) response.getBody();
         assertEquals("InvalidToken", body.get("error"));
     }
@@ -143,7 +139,7 @@ class UserControllerTest {
         var response = controller.uploadDocument("user-1", file, "creator-id");
 
         assertEquals(200, response.getStatusCode().value());
-        assertTrue(((String) response.getBody()).contains("doc.pdf"));
+        assertTrue(response.getBody().contains("doc.pdf"));
 
         // user should now have one document
         assertNotNull(user.getDocuments());

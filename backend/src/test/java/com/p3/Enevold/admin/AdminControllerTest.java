@@ -30,7 +30,7 @@ class AdminControllerTest {
         ResponseEntity<?> response = controller.inviteNewUser(null);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertTrue(response.getBody() instanceof Map);
+        assertInstanceOf(Map.class, response.getBody());
         Map<?, ?> body = (Map<?, ?>) response.getBody();
         assertEquals("InvalidRequest", body.get("error"));
         verifyNoInteractions(repo);
@@ -44,7 +44,7 @@ class AdminControllerTest {
         ResponseEntity<?> response = controller.inviteNewUser(request);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertTrue(response.getBody() instanceof Map);
+        assertInstanceOf(Map.class, response.getBody());
         Map<?, ?> body = (Map<?, ?>) response.getBody();
         assertEquals("InvalidRequest", body.get("error"));
         verifyNoInteractions(repo);
@@ -68,7 +68,7 @@ class AdminControllerTest {
         ResponseEntity<?> response = controller.inviteNewUser(request);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue(response.getBody() instanceof User);
+        assertInstanceOf(User.class, response.getBody());
         User saved = (User) response.getBody();
 
         // status and roles
@@ -106,7 +106,7 @@ class AdminControllerTest {
         ResponseEntity<?> response = controller.inviteNewUser(request);
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertTrue(response.getBody() instanceof Map);
+        assertInstanceOf(Map.class, response.getBody());
         Map<?, ?> body = (Map<?, ?>) response.getBody();
         assertEquals("UserAlreadyActive", body.get("error"));
         assertTrue(body.get("message").toString().contains("existing@example.com"));
@@ -126,7 +126,7 @@ class AdminControllerTest {
         ResponseEntity<?> response = controller.inviteNewUser(request);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertTrue(response.getBody() instanceof Map);
+        assertInstanceOf(Map.class, response.getBody());
         Map<?, ?> body = (Map<?, ?>) response.getBody();
         assertEquals("InvalidArgument", body.get("error"));
         assertEquals("bad arg", body.get("message"));
@@ -144,7 +144,7 @@ class AdminControllerTest {
         ResponseEntity<?> response = controller.inviteNewUser(request);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertTrue(response.getBody() instanceof Map);
+        assertInstanceOf(Map.class, response.getBody());
         Map<?, ?> body = (Map<?, ?>) response.getBody();
         assertEquals("InternalError", body.get("error"));
         assertEquals("boom", body.get("message"));

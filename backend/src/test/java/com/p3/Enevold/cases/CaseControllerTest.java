@@ -39,7 +39,7 @@ class CaseControllerTest {
         ResponseEntity<?> response = controller.createCase("Title", "Desc", "open");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue(response.getBody() instanceof Case);
+        assertInstanceOf(Case.class, response.getBody());
         Case saved = (Case) response.getBody();
         assertEquals("Title", saved.getTitle());
         assertEquals("Desc", saved.getDescription());
@@ -58,7 +58,7 @@ class CaseControllerTest {
         ResponseEntity<?> response = controller.createCase("Title", "Desc", "invalid");
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertTrue(response.getBody() instanceof Map);
+        assertInstanceOf(Map.class, response.getBody());
         Map<?, ?> body = (Map<?, ?>) response.getBody();
         assertEquals("InvalidStatus", body.get("error"));
         assertTrue(body.get("message").toString().contains("Status must be one of"));
@@ -72,7 +72,7 @@ class CaseControllerTest {
         ResponseEntity<?> response = controller.createCase("Title", "Desc", "OPEN");
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertTrue(response.getBody() instanceof Map);
+        assertInstanceOf(Map.class, response.getBody());
         Map<?, ?> body = (Map<?, ?>) response.getBody();
         assertEquals("RuntimeException", body.get("error"));
         assertEquals("db error", body.get("message"));

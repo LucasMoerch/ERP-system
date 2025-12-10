@@ -7,7 +7,10 @@ import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
-import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
 @Configuration
 public class GoogleJwtConfig {
@@ -27,7 +30,7 @@ public class GoogleJwtConfig {
         OAuth2TokenValidator<Jwt> audience = jwt ->
                 jwt.getAudience().contains(googleClientId)
                         ? OAuth2TokenValidatorResult.success()
-                        : OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token","wrong audience",""));
+                        : OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token", "wrong audience", ""));
 
         decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(issuer, audience));
         return decoder;

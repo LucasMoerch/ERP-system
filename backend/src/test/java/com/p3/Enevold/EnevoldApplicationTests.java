@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Test;
 
 class EnevoldApplicationTests {
 
-  @Test
-  void dummy() {
-      // no Spring Boot context, just a placeholder test
-  }
+    @Test
+    void dummy() {
+        // no Spring Boot context, just a placeholder test
+    }
 
 }

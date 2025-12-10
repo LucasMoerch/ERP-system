@@ -21,9 +21,10 @@ export function inspectCase(c: CaseDto): HTMLElement {
   const overlay: HTMLElement = renderCard({ edit: true, endpoint: 'cases', data: c });
   const card: HTMLElement = overlay.querySelector('.card') as HTMLElement;
   const header: HTMLElement = card.querySelector('.header') as HTMLElement;
+  const titleEl: HTMLElement = header.querySelector('h2') as HTMLElement;
   const body: HTMLElement = card.querySelector('.body') as HTMLElement;
 
-  header.innerText = c.title;
+  titleEl.innerText = c.title;
 
   // Body markup
   if (body) {

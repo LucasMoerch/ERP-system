@@ -53,6 +53,15 @@ export function renderCard(options: RenderCardOptions = {}): HTMLElement {
   const headerActions = document.createElement('div');
   headerActions.className = 'd-flex align-items-center gap-2';
 
+  // If this card has no edit mode, add an invisible spacer button
+  if (!options.edit) {
+    const spacer = document.createElement('button');
+    spacer.className =
+      'btn border-0 bg-transparent d-flex align-items-center justify-content-center fs-5 invisible';
+    spacer.innerHTML = '<i class="fa-solid fa-pen-to-square"></i>';
+    headerActions.appendChild(spacer);
+  }
+
   // Assemble header
   header.appendChild(headerLeft);
   header.appendChild(titleEl);
@@ -135,9 +144,9 @@ export function renderCard(options: RenderCardOptions = {}): HTMLElement {
           const initialRoles = Array.isArray(options.data?.roles)
             ? (options.data!.roles as string[])
             : (valueSpan.textContent || '')
-                .split(',')
-                .map((s) => s.trim())
-                .filter(Boolean);
+              .split(',')
+              .map((s) => s.trim())
+              .filter(Boolean);
 
           // fake "users" so we can reuse createCheckboxDropdown
           const fakeUsers = roleIds.map((id) => ({

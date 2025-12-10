@@ -11,10 +11,11 @@ export function renderAddNewStaffCard(
   const overlay = renderCard({ edit: false, endpoint: 'users/create', hasChanges: () => isTyped });
   const card: HTMLElement = overlay.querySelector('.card') as HTMLElement;
   const header: HTMLElement = card.querySelector('.header') as HTMLElement;
+  const titleEl: HTMLElement = header.querySelector('h2') as HTMLElement;
   const body: HTMLElement = card.querySelector('.body') as HTMLElement;
 
-  // HEADER
-  header.innerHTML = `<h4 class="m-0 text-center fw-semibold">Add New Staff</h4>`;
+  // Title
+  titleEl.innerHTML = `<h4 class="m-0 text-center fw-semibold">Add New Staff</h4>`;
 
   // BODY CONTENT
   const formContainer = document.createElement('div');

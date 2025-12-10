@@ -81,7 +81,6 @@ describe('renderStaffPage', () => {
         profile: {
           displayName: 'User One',
         },
-        staff: null,
         audit: null,
       },
     ];
@@ -96,7 +95,12 @@ describe('renderStaffPage', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(mockRenderTable).toHaveBeenCalledWith([{ name: 'User One', role: 'staff' }]);
+    expect(mockRenderTable).toHaveBeenCalledWith([{
+      name: 'User One',
+      role: 'staff',
+      status: 'active',
+      email: 'user@example.com',
+    },]);
     expect(page.querySelector('table')).toBe(tableEl);
   });
 
@@ -129,7 +133,6 @@ describe('renderStaffPage', () => {
           displayName: 'User One',
           phone: '123',
         },
-        staff: null,
         audit: null,
       },
     ];

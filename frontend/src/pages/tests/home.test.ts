@@ -16,6 +16,12 @@ jest.mock('../../api/http', () => ({
   },
 }));
 
+jest.mock('../../auth/auth', () => ({
+  __esModule: true,
+  isAdmin: jest.fn().mockReturnValue(true),
+  userId: jest.fn().mockReturnValue('user-1'),
+}));
+
 jest.mock('../../components/newCard/addNewCaseCard', () => ({
   renderAddNewCaseCard: () => mockRenderAddNewCaseCard(),
 }));

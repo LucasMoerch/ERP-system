@@ -57,6 +57,7 @@ jest.mock('../pages/staff', () => ({
 
 jest.mock('../auth/auth', () => ({
   isAuthenticated: () => mockIsAuthenticated(),
+  isAdmin: jest.fn().mockReturnValue(true),
 }));
 
 describe('resolveRoute', () => {

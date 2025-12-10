@@ -3,12 +3,15 @@
  */
 
 import { renderClientsPage, ClientDTO } from '../clients';
+import http from '../../api/http';
+jest.mock('../../api/http');
+
+const mockGet = http.get as jest.Mock;
 
 const mockRenderSearchComponent = jest.fn();
 const mockRenderTable = jest.fn();
 const mockRenderCard = jest.fn();
 const mockRenderTabs = jest.fn();
-const mockHttpGet = jest.fn();
 
 jest.mock('../../components/searchBar/searchBar', () => ({
   renderSearchComponent: (onSearch: (q: string) => void) => {
@@ -32,13 +35,6 @@ jest.mock('../../components/tabsComponent/tabsComponent', () => ({
   renderTabs: (opts: any) => mockRenderTabs(opts),
 }));
 
-jest.mock('../../api/http', () => ({
-  __esModule: true,
-  default: {
-    get: (url: string) => mockHttpGet(url),
-  },
-}));
-
 describe('renderClientsPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -49,22 +45,20 @@ describe('renderClientsPage', () => {
     const tableEl = document.createElement('table');
     mockRenderTable.mockReturnValue(tableEl);
 
-    const clients: ClientDTO[] = [
+    mockGet.mockResolvedValueOnce([
       {
-        id: 'c1',
+        id: '1',
         name: 'Acme Corp',
         contactPhone: '123',
         contactEmail: 'test@example.com',
-        address: 'Street 1',
       },
-    ];
-    mockHttpGet.mockResolvedValueOnce(clients);
+    ]);
 
     const page = renderClientsPage();
     document.body.appendChild(page);
 
     expect(page.querySelector('h1')?.textContent).toContain('Clients Overview');
-    expect(mockHttpGet).toHaveBeenCalledWith('/clients');
+    expect(mockGet).toHaveBeenCalledWith('/clients');
 
     await Promise.resolve();
     await Promise.resolve();
@@ -72,9 +66,8 @@ describe('renderClientsPage', () => {
     expect(mockRenderTable).toHaveBeenCalledWith([
       {
         name: 'Acme Corp',
-        contactPhone: '123',
-        contactEmail: 'test@example.com',
-        address: 'Street 1',
+        phone: '123',
+        email: 'test@example.com',
       },
     ]);
     expect(page.querySelector('table')).toBe(tableEl);
@@ -99,7 +92,7 @@ describe('renderClientsPage', () => {
     tableEl.appendChild(row2);
 
     mockRenderTable.mockReturnValue(tableEl);
-    mockHttpGet.mockResolvedValueOnce([
+    mockGet.mockResolvedValueOnce([
       { id: 'c1', name: 'Acme Corp' } as ClientDTO,
       { id: 'c2', name: 'Other Client' } as ClientDTO,
     ]);
@@ -138,13 +131,12 @@ describe('renderClientsPage', () => {
         name: 'Acme Corp',
         contactPhone: '123',
         contactEmail: 'test@example.com',
-        address: 'Street 1',
       },
     ];
-    mockHttpGet.mockResolvedValueOnce(clients);
+    mockGet.mockResolvedValueOnce(clients);
 
     const overlay = document.createElement('div');
-    overlay.className = 'client-overlay';
+    overlay.className = 'overlay client-overlay';
     const card = document.createElement('div');
     card.className = 'card';
     const headerEl = document.createElement('div');
@@ -166,12 +158,17 @@ describe('renderClientsPage', () => {
 
     row.click();
 
+    const shownOverlay = document.querySelector('.overlay') as HTMLElement | null;
+    expect(shownOverlay).not.toBeNull();
+    expect(document.body.contains(shownOverlay!)).toBe(true);
+    expect(shownOverlay!.textContent).toContain('Acme Corp');
+
     expect(document.body.contains(overlay)).toBe(true);
     expect(overlay.textContent).toContain('Acme Corp');
   });
 
   test('handles http.get failure by showing error message', async () => {
-    mockHttpGet.mockRejectedValueOnce(new Error('Network error'));
+    mockGet.mockRejectedValueOnce(new Error('Network error'));
 
     const page = renderClientsPage();
     document.body.appendChild(page);

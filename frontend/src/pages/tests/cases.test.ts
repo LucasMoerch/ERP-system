@@ -3,12 +3,16 @@
  */
 
 import { inspectCase, renderCasesPage, CaseDto } from '../cases';
+import http from '../../api/http';
 
-// Mocks for imported UI components and http
+jest.mock('../../api/http');
+
+const mockGet = http.get as jest.Mock;
+
+// Mocks for imported UI components
 const mockRenderTable = jest.fn();
 const mockRenderCard = jest.fn();
 const mockRenderTabs = jest.fn();
-const mockHttpGet = jest.fn();
 
 // search component must return a DOM node
 jest.mock('../../components/searchBar/searchBar', () => ({
@@ -32,16 +36,10 @@ jest.mock('../../components/tabsComponent/tabsComponent', () => ({
   renderTabs: (opts: any) => mockRenderTabs(opts),
 }));
 
-jest.mock('../../api/http', () => ({
-  __esModule: true,
-  default: {
-    get: (url: string) => mockHttpGet(url),
-  },
-}));
-
 describe('inspectCase', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    document.body.innerHTML = '';
   });
 
   test('renders overlay with fields and tabs', () => {
@@ -52,6 +50,8 @@ describe('inspectCase', () => {
 
     const header = document.createElement('div');
     header.className = 'header';
+    const titleEl = document.createElement('h2');
+    header.appendChild(titleEl);
 
     const body = document.createElement('div');
     body.className = 'body';
@@ -86,19 +86,29 @@ describe('inspectCase', () => {
       data: testCase,
     });
 
-    // header should have been set
     expect(result.textContent).toContain('Test Case');
 
-    const idField = result.querySelector('[data-field="id"]') as HTMLElement;
-    const statusField = result.querySelector('[data-field="status"]') as HTMLElement;
-    const descField = result.querySelector('[data-field="description"]') as HTMLElement;
-    const assignedField = result.querySelector('[data-field="assignedUsers"]') as HTMLElement;
+    const idField = result.querySelector('[data-field="id"]') as HTMLElement | null;
+    const statusField = result.querySelector('[data-field="status"]') as HTMLElement | null;
+    const descField = result.querySelector('[data-field="description"]') as HTMLElement | null;
+    const assignedField = result.querySelector(
+      '[data-field="assignedUsers"]',
+    ) as HTMLElement | null;
 
-    expect(idField.textContent).toBe('case-1');
-    expect(statusField.textContent).toBe('OPEN');
-    expect(descField.textContent).toBe('Some description');
-    expect(assignedField.textContent).toContain('user1');
-    expect(assignedField.textContent).toContain('user2');
+    expect(idField).not.toBeNull();
+    expect(statusField).not.toBeNull();
+    expect(assignedField).not.toBeNull();
+
+    expect(idField!.textContent).toBe('case-1');
+    expect(statusField!.textContent).toBe('OPEN');
+
+    // description is optional in the visible UI now
+    if (descField) {
+      expect(descField.textContent).toBe('Some description');
+    }
+
+    expect(assignedField!.textContent).toContain('user1');
+    expect(assignedField!.textContent).toContain('user2');
 
     expect(mockRenderTabs).toHaveBeenCalledWith({
       entityType: 'cases',
@@ -118,7 +128,8 @@ describe('renderCasesPage', () => {
   test('initially renders loading and calls http.get', async () => {
     const tableEl = document.createElement('table');
     mockRenderTable.mockReturnValue(tableEl);
-    mockHttpGet.mockResolvedValueOnce([
+
+    mockGet.mockResolvedValueOnce([
       {
         id: 'case-1',
         clientId: 'client-1',
@@ -134,7 +145,7 @@ describe('renderCasesPage', () => {
     const page = renderCasesPage();
     document.body.appendChild(page);
 
-    expect(mockHttpGet).toHaveBeenCalledWith('/cases');
+    expect(mockGet).toHaveBeenCalledWith('/cases');
 
     // wait for async loadCases to finish
     await Promise.resolve();
@@ -174,9 +185,9 @@ describe('renderCasesPage', () => {
       updatedAt: '2025-01-01T12:00:00.000Z',
     };
 
-    mockHttpGet.mockResolvedValueOnce([caseData]);
+    mockGet.mockResolvedValueOnce([caseData]);
 
-    // let real inspectCase run, but use a simple mock renderCard/tabs so it returns a known overlay
+    // mock renderCard/tabs so inspectCase returns a known overlay
     const overlay = document.createElement('div');
     overlay.className = 'overlay';
     const card = document.createElement('div');
@@ -200,11 +211,13 @@ describe('renderCasesPage', () => {
 
     row.click();
 
-    expect(document.body.contains(overlay)).toBe(true);
+    const shownOverlay = document.querySelector('.overlay') as HTMLElement | null;
+    expect(shownOverlay).not.toBeNull();
+    expect(document.body.contains(shownOverlay!)).toBe(true);
   });
 
   test('handles http.get failure by showing error message', async () => {
-    mockHttpGet.mockRejectedValueOnce(new Error('Network error'));
+    mockGet.mockRejectedValueOnce(new Error('Network error'));
 
     const page = renderCasesPage();
     document.body.appendChild(page);

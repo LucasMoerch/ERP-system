@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 
 @RestController
@@ -56,6 +57,13 @@ public class UserController {
            var lowerEmail = email.toLowerCase();
 
            var user = repo.findByAuthEmail(lowerEmail).orElseThrow(() -> new IllegalStateException("Invite not found for email: " + lowerEmail));
+
+           // If disabled, block it
+           if ("disabled".equalsIgnoreCase(user.getStatus())) {
+                       return ResponseEntity.status(403).body(
+                           java.util.Map.of("error", "UserDisabled",
+                                            "message", "This account has been disabled. Contact an administrator."));
+                   }
 
            // If already active with a different sub, block it
            if (user.getAuth() != null && user.getAuth().getSub() != null && !user.getAuth().getSub().isBlank()) {
@@ -94,7 +102,8 @@ public class UserController {
 
     }
 
-    // Edit user details
+    // Edit user details (only by admin)
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
       public ResponseEntity<User> putUser(@PathVariable String id, @RequestBody User body) {
       var existing = repo.findById(id).orElse(null);
@@ -104,6 +113,52 @@ public class UserController {
       var saved = repo.save(body);
       return ResponseEntity.ok(saved);
     }
+
+    // Update own profile details
+    public record SelfProfileUpdateRequest(
+        String firstName,
+        String lastName,
+        String displayName,
+        String phone,
+        String address,
+        String cpr,
+        String bankReg,
+        String bankNumber
+    ) {}
+
+    @PreAuthorize("#id == principal.userId")
+    @PutMapping("/{id}/profile")
+    public ResponseEntity<?> updateProfile(@PathVariable String id,
+                                           @RequestBody SelfProfileUpdateRequest req) {
+        var user = repo.findById(id).orElse(null);
+        if (user == null) return ResponseEntity.notFound().build();
+
+        if (user.getProfile() == null) user.setProfile(new User.Profile());
+        var p = user.getProfile();
+        p.setFirstName(req.firstName());
+        p.setLastName(req.lastName());
+        p.setDisplayName(req.displayName());
+        p.setPhone(req.phone());
+        p.setAddress(req.address());
+        p.setCPR(req.cpr());
+        p.setBankReg(req.bankReg());
+        p.setBankNumber(req.bankNumber());
+
+        return ResponseEntity.ok(repo.save(user));
+    }
+
+
+    // Delete user (only by admin)
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable String id) {
+        if (!repo.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        repo.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
 
     // Upload a file/document to a specific user
     @PostMapping("/{userId}/uploadDocument")
@@ -182,5 +237,6 @@ public class UserController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> all() { return ResponseEntity.ok(repo.findAll()); }
 }

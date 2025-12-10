@@ -236,14 +236,17 @@ export function renderTimeTracker(): HTMLElement {
     const overlay = renderCard({ edit: false, endpoint: 'times' });
     const card: HTMLElement = overlay.querySelector('.card') as HTMLElement;
     const header: HTMLElement = card.querySelector('.header') as HTMLElement;
+    const titleEl: HTMLElement = header.querySelector('h2') as HTMLElement;
     const body: HTMLElement = card.querySelector('.body') as HTMLElement;
 
     card.classList.add('d-flex', 'flex-column', 'h-100');
     header.classList.add('flex-shrink-0');
     body.classList.add('d-flex', 'flex-column', 'flex-grow-1', 'overflow-auto', 'pb-4');
 
-    //To replace the placeholder
-    header.innerText = 'Time Registration';
+    if (titleEl) {
+      titleEl.innerText = 'Time Registration';
+      titleEl.title = 'Time Registration';
+    }
 
     const popup: HTMLDivElement = document.createElement('div');
     popup.className = 'completion-popup';

@@ -71,12 +71,13 @@ export function renderClientsPage(): HTMLElement {
     const overlay = renderCard({ edit: true, endpoint: 'clients', data: client });
     const card: HTMLElement = overlay.querySelector('.card') as HTMLElement;
     const headerEl: HTMLElement = card.querySelector('.header') as HTMLElement;
+    const titleEl: HTMLElement = headerEl.querySelector('h2') as HTMLElement;
     const body: HTMLElement = card.querySelector('.body') as HTMLElement;
 
     const backButton = overlay.querySelector('.closeBtn');
     if (backButton) backButton.remove();
 
-    headerEl.innerText = client.name;
+    titleEl.innerText = client.name;
 
     const back = headerEl.querySelector('.exit-button');
     back?.addEventListener('click', () => overlay.remove());

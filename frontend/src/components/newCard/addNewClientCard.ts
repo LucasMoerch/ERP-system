@@ -11,9 +11,10 @@ export function renderAddNewClientCard(): HTMLElement {
   });
   const card = overlay.querySelector('.card') as HTMLElement;
   const header = card.querySelector('.header') as HTMLElement;
+  const titleEl: HTMLElement = header.querySelector('h2') as HTMLElement;
   const body = card.querySelector('.body') as HTMLElement;
 
-  header.innerHTML = `<h4 class="m-0 text-center fw-semibold">Add New Client</h4>`;
+  titleEl.innerHTML = `<h4 class="m-0 text-center fw-semibold">Add New Client</h4>`;
 
   const formContainer = document.createElement('div');
   formContainer.className = 'container p-4 rounded';

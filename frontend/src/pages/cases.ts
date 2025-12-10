@@ -24,7 +24,10 @@ export function inspectCase(c: CaseDto): HTMLElement {
   const titleEl: HTMLElement = header.querySelector('h2') as HTMLElement;
   const body: HTMLElement = card.querySelector('.body') as HTMLElement;
 
-  titleEl.innerText = c.title;
+  if (titleEl) {
+    titleEl.innerText = c.title;
+    titleEl.title = c.title;
+  }
 
   // Body markup
   if (body) {
@@ -185,7 +188,6 @@ export function renderCasesPage(): HTMLElement {
           const selectedCase = cases[index - 1]; // match index with case
           const popup = inspectCase(selectedCase);
           document.body.appendChild(popup);
-          console.log('case clicked', selectedCase.id);
         });
       });
     } catch (err) {

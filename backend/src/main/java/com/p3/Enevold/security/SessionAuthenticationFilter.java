@@ -1,6 +1,5 @@
 package com.p3.Enevold.security;
 
-import com.p3.Enevold.users.User;
 import com.p3.Enevold.users.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -8,10 +7,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
 import java.util.List;
@@ -52,8 +51,8 @@ public class SessionAuthenticationFilter extends OncePerRequestFilter {
                                 .toList();
 
 
-          System.out.println("SESSION FILTER: roles=" + user.getRoles());
-          System.out.println("SESSION FILTER: authorities=" + authorities);
+                        System.out.println("SESSION FILTER: roles=" + user.getRoles());
+                        System.out.println("SESSION FILTER: authorities=" + authorities);
                         // principal = user id (String)
                         var auth = new UsernamePasswordAuthenticationToken(uid, null, authorities);
                         auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -67,5 +66,6 @@ public class SessionAuthenticationFilter extends OncePerRequestFilter {
     }
 
     // Principal to read from SecurityContext
-    public record SessionUserPrincipal(String id, String email, List<String> roles) {}
+    public record SessionUserPrincipal(String id, String email, List<String> roles) {
+    }
 }

@@ -111,7 +111,6 @@ export function renderAddNewCaseCard(): HTMLElement {
         params: { title, description, status },
       });
 
-      console.log('Case created successfully:', data);
       alert(`Case created successfully.`);
 
       overlay.remove();

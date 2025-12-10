@@ -50,6 +50,8 @@ public class User {
         private String birthDate;
         private String address;
         private String cpr;
+        private String bankReg;
+        private String bankNumber;
         // getters/setters
         public String getFirstName() { return firstName; }
         public void setFirstName(String firstName) { this.firstName = firstName; }
@@ -70,6 +72,10 @@ public class User {
 
         public String getCPR() {return cpr; }
         public void setCPR(String cpr) { this.cpr = cpr; }
+        public String getBankReg() { return bankReg; }
+        public void setBankReg(String bankReg) { this.bankReg = bankReg; }
+        public String getBankNumber() { return bankNumber; }
+        public void setBankNumber(String bankNumber) { this.bankNumber = bankNumber; }
     }
 
     // getters/setters

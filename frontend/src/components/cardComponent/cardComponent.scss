@@ -16,15 +16,15 @@
     height: 95%;
     overflow: auto;
     border-radius: 0;
+    position: relative;
   }
 }
 
-.header {
-  padding: 0 4rem;
-  text-align: center;
-  text-overflow: hidden;
-  white-space: nowrap;
-  display: block;
+.overlay .card .header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #f4f5f6;
 }
 
 .back-button {

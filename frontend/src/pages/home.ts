@@ -95,7 +95,6 @@ export function renderHomePage(): HTMLElement {
   async function loadCases() {
     try {
       const cases = (await http.get('/cases')) as CaseDto[];
-      console.log('Fetched cases:', cases);
 
       const meId = userId();
 

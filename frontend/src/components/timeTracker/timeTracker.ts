@@ -18,16 +18,13 @@ async function checkForUnresolvedTime(
 ) {
   try {
     const currentUserId = getUserId();
-    console.log('Current User ID:', currentUserId);
     if (!currentUserId) {
       console.error('User ID is not available.');
       return;
     }
 
     const last = (await http.get(`/times/users/${currentUserId}/last-time`)) as TimeEntryDto;
-    console.log('Last time entry fetched:', last.startTime, last.stopTime);
     if (!last) {
-      console.log('No last time entry found for user.');
       return;
     }
 
@@ -42,7 +39,6 @@ async function checkForUnresolvedTime(
       displayTime('startTime', entry.startTime);
       return entry.startTime;
     } else {
-      console.log('Last time entry is already completed.');
       return;
     }
 
@@ -61,7 +57,6 @@ async function loadCases() {
       id: c.id || 'Untitled',
     }));
 
-    console.log('Loaded cases:', caseData);
     const casesSelect = document.getElementById('caseSelect') as HTMLSelectElement;
     if (!casesSelect) {
       console.error('Case select element not found');
@@ -92,7 +87,6 @@ async function sendStartTimeData(
     }
 
     const response = await http.post('/times/start', params);
-    console.log('Response:', response);
   } catch (error: any) {
     console.error('Error:', error.response?.data || error.message);
   }
@@ -120,7 +114,6 @@ async function updateTimeData(
         originalStartTime,
       }),
     );
-    console.log('Response:', response);
   } catch (error: any) {
     console.error('Error:', error.response?.data || error.message);
   }
@@ -430,7 +423,6 @@ export function renderTimeTracker(): HTMLElement {
 
       const caseId = getCaseIdFromSelect();
 
-      console.log('Current User ID:', currentUserId);
       //This time needs to be stored the same place as the Id so that each account has a latest time that can be queried
       originalStartTime = startTimeNow;
 
@@ -447,7 +439,6 @@ export function renderTimeTracker(): HTMLElement {
       buttonRow.appendChild(completeBtn);
       displayTime('stopTime', stopTimeNow);
       updateTotalTimeField(startTimeInputEl, stopTimeInputEl, totalTimeInputEl);
-      console.log('original time', originalStartTime);
       stopTimeBtn.remove();
     });
 

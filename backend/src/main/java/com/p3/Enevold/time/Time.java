@@ -19,30 +19,75 @@ public class Time {
 
     // Getters and setters
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public String getId() {
+        return id;
+    }
 
-    public String getUserId() { return userId; }
-    public void setUserId(String userId) { this.userId = userId; }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    public String getUserName() { return userName; }
-    public void setUserName(String userName) { this.userName = userName; }
+    public String getUserId() {
+        return userId;
+    }
 
-    public String getDate() { return date; }
-    public void setDate(String date) { this.date = date; }
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
-    public String getCaseId() { return caseId; }
-    public void setCaseId(String caseId) { this.caseId = caseId; }
+    public String getUserName() {
+        return userName;
+    }
 
-    public String getStartTime() { return startTime; }
-    public void setStartTime(String startTime) { this.startTime = startTime; }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-    public String getStopTime() { return stopTime; }
-    public void setStopTime(String stopTime) { this.stopTime = stopTime; }
+    public String getDate() {
+        return date;
+    }
 
-    public String getTotalTime() { return totalTime; }
-    public void setTotalTime(String totalTime) { this.totalTime = totalTime; }
+    public void setDate(String date) {
+        this.date = date;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public String getCaseId() {
+        return caseId;
+    }
+
+    public void setCaseId(String caseId) {
+        this.caseId = caseId;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getStopTime() {
+        return stopTime;
+    }
+
+    public void setStopTime(String stopTime) {
+        this.stopTime = stopTime;
+    }
+
+    public String getTotalTime() {
+        return totalTime;
+    }
+
+    public void setTotalTime(String totalTime) {
+        this.totalTime = totalTime;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

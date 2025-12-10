@@ -57,7 +57,6 @@ export function renderClientsPage(): HTMLElement {
           const client = clients[index - 1];
           const popup = inspectClient(client);
           document.body.appendChild(popup);
-          console.log('client clicked');
         });
       });
     } catch (err) {
@@ -77,8 +76,10 @@ export function renderClientsPage(): HTMLElement {
     const backButton = overlay.querySelector('.closeBtn');
     if (backButton) backButton.remove();
 
-    titleEl.innerText = client.name;
-
+    if (titleEl) {
+      titleEl.innerText = client.name;
+      titleEl.title = client.name;
+    }
     const back = headerEl.querySelector('.exit-button');
     back?.addEventListener('click', () => overlay.remove());
 

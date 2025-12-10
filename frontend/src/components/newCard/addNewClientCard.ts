@@ -194,7 +194,6 @@ export function renderAddNewClientCard(): HTMLElement {
         identifierType: idType, // "cpr" / "cvr"
         identifierValue: idValue, // the actual number
       });
-      console.log('Client created:', created);
       overlay.remove();
 
       const clientsPage = document.querySelector('.clients-page') as any;

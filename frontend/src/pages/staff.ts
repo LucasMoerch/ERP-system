@@ -164,23 +164,22 @@ function inspectUser(user: UserDTO): HTMLElement {
           <span class="label text-muted fw-medium">Address</span>
           <span class="value fw-semibold text-end" data-field="profile.address">${user.profile?.address || 'N/A'}</span>
         </div>
-        <div class="info-row d-flex justify-content-between py-3">
+        <div class="info-row d-flex justify-content-between border-bottom py-3">
           <span class="label text-muted fw-medium">CPR Number</span>
           <span class="value fw-semibold" data-field="profile.cpr">${user.profile?.cpr || 'N/A'}</span>
         </div>
-        <div class="info-row d-flex justify-content-between py-3">
+        <div class="info-row d-flex justify-content-between border-bottom py-3">
           <span class="label text-muted fw-medium">Roles</span>
-          <span class="value fw-semibold dropdown" data-field="roles" data-transform="commaList">${
-            Array.isArray(user.roles) ? user.roles.join(', ') : user.roles || 'N/A'
-          }</span>
+          <span class="value fw-semibold dropdown" data-field="roles" data-transform="commaList">${Array.isArray(user.roles) ? user.roles.join(', ') : user.roles || 'N/A'
+    }</span>
         </div>
-        <div class="info-row d-flex justify-content-between py-3">
+        <div class="info-row d-flex justify-content-between border-bottom py-3">
           <span class="label text-muted fw-medium">Bank Reg.</span>
           <span class="value fw-semibold" data-field="profile.bankReg">
             ${user.profile?.bankReg || 'N/A'}
           </span>
         </div>
-        <div class="info-row d-flex justify-content-between py-3">
+        <div class="info-row d-flex justify-content-between border-bottom py-3">
           <span class="label text-muted fw-medium">Bank Number</span>
           <span class="value fw-semibold" data-field="profile.bankNumber">
             ${user.profile?.bankNumber || 'N/A'}

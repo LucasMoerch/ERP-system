@@ -24,6 +24,8 @@ function render() {
   }
   // Renders the navbar on all pages
   if (!excludedPages.includes(location.pathname)) {
+    document.body.style.overflow = ''; // reset overflow after hidden on login page
+
     document.body.style.paddingTop = '56px'; // match navbar height
 
     let navbar = document.getElementById('navbar-container');
@@ -51,6 +53,7 @@ function render() {
 export function navigate(path: string) {
   history.pushState({}, '', path);
   render();
+  window.scrollTo(0, 0); // always start new page at top
 }
 
 // Initial load (including hard refresh)

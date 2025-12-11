@@ -247,7 +247,7 @@ function inspectUser(user: UserDTO): HTMLElement {
 
 export function renderStaffPage(): HTMLElement {
   const div = document.createElement('div');
-  div.innerHTML = `<h1>Staff page</h1>`;
+  div.innerHTML = `<h1>Staff Overview</h1>`;
 
   const container = document.createElement('div');
   container.classList.add('container', 'staff-page');

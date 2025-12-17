@@ -60,7 +60,7 @@ export function renderMyProfilePage(): HTMLElement {
       </div>
       <div class="info-row d-flex justify-content-between border-bottom py-2">
         <span class="label text-muted fw-medium">CPR</span>
-        <span class="value fw-semibold text-end" data-field="cpr">${me.cpr || 'N/A'}</span>
+        <span class="fw-semibold text-end">${me.cpr || 'N/A'}</span>
       </div>
       <div class="info-row d-flex justify-content-between border-bottom py-2">
         <span class="label text-muted fw-medium">Phone</span>

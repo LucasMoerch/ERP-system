@@ -144,28 +144,31 @@ function displayTime(elementId: string, time: string): void {
   }
 }
 
+function normalizeTimeToHMS(t: string): string {
+  // iOS often returns "HH:MM" even when step=1
+  const parts = (t || '').split(':');
+  const hh = (parts[0] ?? '00').padStart(2, '0');
+  const mm = (parts[1] ?? '00').padStart(2, '0');
+  const ss = (parts[2] ?? '00').padStart(2, '0');
+  return `${hh}:${mm}:${ss}`;
+}
+
 function calculateTotalTime(startTime: string, stopTime: string): string {
-  //splits the stop and start time strings into hours, minutes and seconds
-  const [startHours, startMinutes, startSeconds] = startTime.split(':').map(Number);
-  const [stopHours, stopMinutes, stopSeconds] = stopTime.split(':').map(Number);
+  const start = normalizeTimeToHMS(startTime);
+  const stop  = normalizeTimeToHMS(stopTime);
+
+  const [startHours, startMinutes, startSeconds] = start.split(':').map(Number);
+  const [stopHours, stopMinutes, stopSeconds] = stop.split(':').map(Number);
 
   let totalSeconds =
-    stopHours * 3600 +
-    stopMinutes * 60 +
-    stopSeconds -
+    stopHours * 3600 + stopMinutes * 60 + stopSeconds -
     (startHours * 3600 + startMinutes * 60 + startSeconds);
 
-  if (totalSeconds < 0) {
-    totalSeconds += 24 * 3600; // Adjust for times that cross midnight
-  }
+  if (totalSeconds < 0) totalSeconds += 24 * 3600;
 
-  const hours = Math.floor(totalSeconds / 3600)
-    .toString()
-    .padStart(2, '0');
-  const minutes = Math.floor((totalSeconds % 3600) / 60)
-    .toString()
-    .padStart(2, '0');
-  const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+  const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+  const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+  const seconds = String(totalSeconds % 60).padStart(2, '0');
   return `${hours}:${minutes}:${seconds}`;
 }
 

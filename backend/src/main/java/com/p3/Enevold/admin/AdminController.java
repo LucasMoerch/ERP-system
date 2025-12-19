@@ -4,7 +4,11 @@ import com.p3.Enevold.users.User;
 import com.p3.Enevold.users.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -66,16 +70,27 @@ public class AdminController {
                     user.setProfile(new User.Profile());
                 }
 
+                User.Profile profile = user.getProfile();
+
+                // Map extra fields from request
+                profile.setFirstName(request.getFirstName());
+                profile.setLastName(request.getLastName());
+                profile.setDisplayName(request.getFullName());
+                profile.setPhone(request.getPhone());
+                profile.setAddress(request.getAddress());
+                profile.setCPR(request.getCPR());
 
                 if (!filteredRoles.isEmpty()) {
                     user.setRoles(filteredRoles);
                 }
-                } else { // send error if already invited
-                    return ResponseEntity.status(409)
-                            .body(Map.of("error", "UserAlreadyActive",
-                                          "message", "User with email " + lowerEmail + " is already active."));
 
-                }
+
+            } else { // send error if already invited
+                return ResponseEntity.status(409)
+                        .body(Map.of("error", "UserAlreadyActive",
+                                "message", "User with email " + lowerEmail + " is already active."));
+
+            }
 
 
             // Save via repository

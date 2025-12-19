@@ -3,6 +3,7 @@ import { renderSearchComponent } from '../components/searchBar/searchBar';
 import { renderCard } from '../components/cardComponent/cardComponent';
 import http from '../api/http';
 import { renderTabs } from '../components/tabsComponent/tabsComponent';
+import { isAdmin } from '../auth/auth';
 
 export type CaseDto = {
   id: string;
@@ -20,9 +21,13 @@ export function inspectCase(c: CaseDto): HTMLElement {
   const overlay: HTMLElement = renderCard({ edit: true, endpoint: 'cases', data: c });
   const card: HTMLElement = overlay.querySelector('.card') as HTMLElement;
   const header: HTMLElement = card.querySelector('.header') as HTMLElement;
+  const titleEl: HTMLElement = header.querySelector('h2') as HTMLElement;
   const body: HTMLElement = card.querySelector('.body') as HTMLElement;
 
-  header.innerText = c.title;
+  if (titleEl) {
+    titleEl.innerText = c.title;
+    titleEl.title = c.title;
+  }
 
   // Body markup
   if (body) {
@@ -39,7 +44,7 @@ export function inspectCase(c: CaseDto): HTMLElement {
             </div>
 
             <div class="info-row d-flex justify-content-between border-bottom py-3">
-              <span class="label text-muted fw-medium">Client ID</span>
+              <span class="label text-muted fw-medium">Client</span>
               <span
                 class="value dropdown fw-semibold"
                 data-field="clientId"
@@ -47,12 +52,6 @@ export function inspectCase(c: CaseDto): HTMLElement {
               >
                 ${c.clientId ? c.clientId : 'None'}
               </span>            </div>
-
-            <div class="info-row d-flex justify-content-between border-bottom py-3">
-              <span class="label text-muted fw-medium">Description</span>
-              <span class="value fw-semibold text-end" data-field="description">${c.description || '-'}</span>
-            </div>
-
             <div class="info-row d-flex justify-content-between border-bottom py-3">
               <span class="label text-muted fw-medium">Status</span>
               <span class="value dropdown fw-semibold" data-field="status" data-options="OPEN,ON_HOLD,CLOSED">${c.status}</span>
@@ -85,6 +84,37 @@ export function inspectCase(c: CaseDto): HTMLElement {
   card.appendChild(
     renderTabs({ entityType: 'cases', entityId: c.id, description: c.description || '' }),
   );
+
+  // Delete button for admins
+  if (isAdmin()) {
+    const footer = document.createElement('div');
+    footer.className = 'd-flex justify-content-end gap-2 p-3';
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'btn btn-outline-danger delete-case-button';
+    deleteBtn.innerText = 'Delete case';
+
+    deleteBtn.addEventListener('click', async () => {
+      const confirmed = window.confirm(
+        `Are you sure you want to permanently delete case "${c.title}"?`,
+      );
+      if (!confirmed) return;
+
+      try {
+        await http.delete(`/cases/${c.id}`);
+        overlay.remove();
+
+        const casesPage = document.querySelector('.cases-page') as any;
+        if (casesPage?.reload) casesPage.reload();
+      } catch (err) {
+        console.error('Failed to delete case', err);
+        alert('Failed to delete case. Please try again.');
+      }
+    });
+
+    footer.appendChild(deleteBtn);
+    card.appendChild(footer);
+  }
 
   return overlay;
 }
@@ -158,7 +188,6 @@ export function renderCasesPage(): HTMLElement {
           const selectedCase = cases[index - 1]; // match index with case
           const popup = inspectCase(selectedCase);
           document.body.appendChild(popup);
-          console.log('case clicked', selectedCase.id);
         });
       });
     } catch (err) {

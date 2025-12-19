@@ -12,9 +12,10 @@ export interface Me {
   roles?: Role[];
   status?: string;
   cpr?: string;
-  birthDate?: string;
-  phoneNumber?: string;
+  phone?: string;
   address?: string;
+  bankReg?: string;
+  bankNumber?: string;
   documents?: any[];
   createdAt?: string;
   updatedAt?: string;
@@ -68,10 +69,15 @@ export function userId() {
   return me?.id ?? null;
 }
 export function getMe() {
+  console.log('getMe called, me:', me);
   return me;
 }
 export function getDisplayName() {
   return me?.displayName ?? null;
+}
+
+export function isLoggedIn(): boolean {
+  return !!localStorage.getItem('authToken');
 }
 
 // For logout

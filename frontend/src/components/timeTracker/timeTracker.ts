@@ -18,16 +18,13 @@ async function checkForUnresolvedTime(
 ) {
   try {
     const currentUserId = getUserId();
-    console.log('Current User ID:', currentUserId);
     if (!currentUserId) {
       console.error('User ID is not available.');
       return;
     }
 
     const last = (await http.get(`/times/users/${currentUserId}/last-time`)) as TimeEntryDto;
-    console.log('Last time entry fetched:', last.startTime, last.stopTime);
     if (!last) {
-      console.log('No last time entry found for user.');
       return;
     }
 
@@ -42,7 +39,6 @@ async function checkForUnresolvedTime(
       displayTime('startTime', entry.startTime);
       return entry.startTime;
     } else {
-      console.log('Last time entry is already completed.');
       return;
     }
 
@@ -61,7 +57,6 @@ async function loadCases() {
       id: c.id || 'Untitled',
     }));
 
-    console.log('Loaded cases:', caseData);
     const casesSelect = document.getElementById('caseSelect') as HTMLSelectElement;
     if (!casesSelect) {
       console.error('Case select element not found');
@@ -92,7 +87,6 @@ async function sendStartTimeData(
     }
 
     const response = await http.post('/times/start', params);
-    console.log('Response:', response);
   } catch (error: any) {
     console.error('Error:', error.response?.data || error.message);
   }
@@ -120,7 +114,6 @@ async function updateTimeData(
         originalStartTime,
       }),
     );
-    console.log('Response:', response);
   } catch (error: any) {
     console.error('Error:', error.response?.data || error.message);
   }
@@ -236,14 +229,17 @@ export function renderTimeTracker(): HTMLElement {
     const overlay = renderCard({ edit: false, endpoint: 'times' });
     const card: HTMLElement = overlay.querySelector('.card') as HTMLElement;
     const header: HTMLElement = card.querySelector('.header') as HTMLElement;
+    const titleEl: HTMLElement = header.querySelector('h2') as HTMLElement;
     const body: HTMLElement = card.querySelector('.body') as HTMLElement;
 
     card.classList.add('d-flex', 'flex-column', 'h-100');
     header.classList.add('flex-shrink-0');
     body.classList.add('d-flex', 'flex-column', 'flex-grow-1', 'overflow-auto', 'pb-4');
 
-    //To replace the placeholder
-    header.innerText = 'Time Registration';
+    if (titleEl) {
+      titleEl.innerText = 'Time Registration';
+      titleEl.title = 'Time Registration';
+    }
 
     const popup: HTMLDivElement = document.createElement('div');
     popup.className = 'completion-popup';
@@ -304,17 +300,17 @@ export function renderTimeTracker(): HTMLElement {
     buttonRow.id = 'buttonRow';
 
     const startTimeBtn = document.createElement('button');
-    startTimeBtn.className = 'btn btn-success shadow col-4 rounded-pill ms-4';
+    startTimeBtn.className = 'btn btn-success col-12 shadow rounded-pill';
     startTimeBtn.innerText = 'Start Time';
     startTimeBtn.id = 'startTimeBtn';
 
     const stopTimeBtn = document.createElement('button');
-    stopTimeBtn.className = 'btn btn-danger shadow col-4 rounded-pill ms-4';
+    stopTimeBtn.className = 'btn btn-danger shadow col-12 rounded-pill';
     stopTimeBtn.innerText = 'Stop Time';
     stopTimeBtn.id = 'stopTimeBtn';
 
     const completeBtn: HTMLButtonElement = document.createElement('button');
-    completeBtn.className = 'btn btn-primary shadow col-4 rounded-pill ms-4';
+    completeBtn.className = 'btn btn-primary shadow col-12 rounded-pill';
     completeBtn.innerText = 'Complete';
 
     const startStopTimeRow: HTMLDivElement = document.createElement('div');
@@ -326,7 +322,7 @@ export function renderTimeTracker(): HTMLElement {
       <input
         type="time"
         step="1"
-        class="form-control mx-auto px-2 shadow-sm lighter-bg clockText text-center"
+        class="form-control mx-auto px-0 shadow-sm lighter-bg clockText text-center"
         id="startTime"
         value="00:00:00">
       </div>
@@ -350,6 +346,7 @@ export function renderTimeTracker(): HTMLElement {
      <label for="totalTime" class="form-label">Total Time</label> <br>
      <div class="container col-12 rounded text-center bg-transparent py-1">
       <input
+        disabled
         type="time"
         step="1"
         class="form-control totalTime-field mx-auto px-2 shadow-sm lighter-bg clockText text-center"
@@ -426,7 +423,6 @@ export function renderTimeTracker(): HTMLElement {
 
       const caseId = getCaseIdFromSelect();
 
-      console.log('Current User ID:', currentUserId);
       //This time needs to be stored the same place as the Id so that each account has a latest time that can be queried
       originalStartTime = startTimeNow;
 
@@ -443,7 +439,6 @@ export function renderTimeTracker(): HTMLElement {
       buttonRow.appendChild(completeBtn);
       displayTime('stopTime', stopTimeNow);
       updateTotalTimeField(startTimeInputEl, stopTimeInputEl, totalTimeInputEl);
-      console.log('original time', originalStartTime);
       stopTimeBtn.remove();
     });
 

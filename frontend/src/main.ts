@@ -5,6 +5,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import { resolveRoute } from './routers/router';
 import { renderHeaderAndNavbar } from './components/navbar';
 import { getPageTitle } from './components/navbar';
+import { initAuth, isAuthenticated } from './auth/auth';
 
 function render() {
   const app = document.getElementById('app')! as HTMLElement;
@@ -23,6 +24,8 @@ function render() {
   }
   // Renders the navbar on all pages
   if (!excludedPages.includes(location.pathname)) {
+    document.body.style.overflow = ''; // reset overflow after hidden on login page
+
     document.body.style.paddingTop = '56px'; // match navbar height
 
     let navbar = document.getElementById('navbar-container');
@@ -50,10 +53,19 @@ function render() {
 export function navigate(path: string) {
   history.pushState({}, '', path);
   render();
+  window.scrollTo(0, 0); // always start new page at top
 }
 
-// Run once at startup
-window.addEventListener('load', render);
+// Initial load (including hard refresh)
+window.addEventListener('load', () => {
+  // hydrate "me" from /me and sessionStorage first
+  initAuth().finally(() => {
+    if (!isAuthenticated() && location.pathname !== '/login') {
+      history.replaceState({}, '', '/login');
+    }
+    render();
+  });
+});
 
 // Handle back/forward buttons
 window.addEventListener('popstate', render);

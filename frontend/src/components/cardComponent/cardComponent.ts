@@ -26,10 +26,46 @@ export function renderCard(options: RenderCardOptions = {}): HTMLElement {
 
   card.addEventListener('click', (ev) => ev.stopPropagation());
 
+  // Header creation
+  const header = document.createElement('div');
+  header.className =
+    'header shadow-sm d-flex align-items-center justify-content-between px-3 px-sm-4 pt-3 pb-2 border-bottom';
+
+  // Left side: close button
+  const headerLeft = document.createElement('div');
+  headerLeft.className = 'd-flex align-items-center gap-2';
+
   const closeBtn = document.createElement('button');
   closeBtn.className =
-    'btn back-button border-0 bg-transparent text-primary position-absolute top-0 start-0 m-3 fs-2';
+    'btn back-button border-0 bg-transparent text-primary d-flex align-items-center justify-content-center fs-4';
   closeBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+  closeBtn.setAttribute('aria-label', 'Close');
+
+  headerLeft.appendChild(closeBtn);
+
+  // Center: title
+  const titleEl = document.createElement('h2');
+  titleEl.className = 'm-0 fs-5 text-truncate flex-grow-1 text-center';
+  titleEl.innerText = 'placeholder';
+  titleEl.title = titleEl.innerText;
+
+  // Right side: edit/save buttons
+  const headerActions = document.createElement('div');
+  headerActions.className = 'd-flex align-items-center gap-2';
+
+  // If this card has no edit mode, add an invisible spacer button
+  if (!options.edit) {
+    const spacer = document.createElement('button');
+    spacer.className =
+      'btn border-0 bg-transparent d-flex align-items-center justify-content-center fs-5 invisible';
+    spacer.innerHTML = '<i class="fa-solid fa-pen-to-square"></i>';
+    headerActions.appendChild(spacer);
+  }
+
+  // Assemble header
+  header.appendChild(headerLeft);
+  header.appendChild(titleEl);
+  header.appendChild(headerActions);
 
   let preloaded: { users?: UserDTO[]; clients?: any[] } = {};
   const hasCasesEndpoint = options.endpoint === 'cases';
@@ -76,9 +112,9 @@ export function renderCard(options: RenderCardOptions = {}): HTMLElement {
   if (options.edit) {
     const editBtn = document.createElement('button');
     editBtn.className =
-      'btn edit-button border-0 bg-transparent text-primary position-absolute top-0 end-0 m-3 fs-2';
+      'btn edit-button border-0 bg-transparent text-primary d-flex align-items-center justify-content-center fs-5';
     editBtn.innerHTML = '<i class="fa-solid fa-pen-to-square"></i>';
-    card.appendChild(editBtn);
+    headerActions.appendChild(editBtn);
 
     editBtn.addEventListener('click', async () => {
       if (hasCasesEndpoint && (!preloaded.users || !preloaded.clients)) {
@@ -98,6 +134,39 @@ export function renderCard(options: RenderCardOptions = {}): HTMLElement {
         const field = valueSpan.dataset.field;
         if (!field || valueSpan.dataset.editable === 'false') return;
         if (valueSpan.querySelector('[data-edit-widget]')) return;
+
+        // Use checkbox dropdown for roles
+        if (field === 'roles') {
+          // allowed roles
+          const roleIds = ['staff', 'admin'];
+
+          // initial selection from data or from text "staff, admin"
+          const initialRoles = Array.isArray(options.data?.roles)
+            ? (options.data!.roles as string[])
+            : (valueSpan.textContent || '')
+              .split(',')
+              .map((s) => s.trim())
+              .filter(Boolean);
+
+          // fake "users" so we can reuse createCheckboxDropdown
+          const fakeUsers = roleIds.map((id) => ({
+            id,
+            auth: { provider: 'google', email: id, emailVerified: false },
+            profile: { displayName: id.charAt(0).toUpperCase() + id.slice(1) },
+          })) as UserDTO[];
+
+          const { container, getSelectedIds } = createCheckboxDropdown(fakeUsers, initialRoles);
+
+          container.dataset.editWidget = 'roles';
+          container.dataset.field = field;
+
+          valueSpan.textContent = '';
+          valueSpan.appendChild(container);
+
+          // let save-handler read selected roles
+          (valueSpan as any).__getSelectedIds = getSelectedIds;
+          return;
+        }
 
         if (field === 'assignedUsers') {
           const users = preloaded.users || [];
@@ -212,11 +281,10 @@ export function renderCard(options: RenderCardOptions = {}): HTMLElement {
       editBtn.remove();
 
       const saveBtn = document.createElement('button');
-      saveBtn.className =
-        'btn btn-sm btn-primary position-absolute top-0 end-0 my-4 mx-1 py-1 px-2';
-      saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save';
+      saveBtn.className = 'btn btn-sm btn-primary d-flex align-items-center justify-content-center';
+      saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk me-1"></i><span>Save</span>';
 
-      card.appendChild(saveBtn);
+      headerActions.appendChild(saveBtn);
 
       const setNestedValue = (target: Record<string, unknown>, path: string, value: unknown) => {
         const segments = path.split('.');
@@ -383,10 +451,6 @@ export function renderCard(options: RenderCardOptions = {}): HTMLElement {
     });
   }
 
-  const header = document.createElement('div');
-  header.className = 'header mt-4 text-center fw-semibold fs-3 ';
-  header.innerText = 'placeholder';
-
   const body = document.createElement('div');
   body.className = 'body';
 
@@ -407,7 +471,6 @@ export function renderCard(options: RenderCardOptions = {}): HTMLElement {
       overlay.remove();
     }
   });
-  card.appendChild(closeBtn);
   overlay.appendChild(card);
   card.appendChild(header);
   card.appendChild(body);

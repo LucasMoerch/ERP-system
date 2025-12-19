@@ -38,9 +38,12 @@
   letter-spacing: 2px;
   user-select: none;
 }
+.clockText.form-control {
+  padding-right: 0 !important;
+}
 
 .clockText {
-  font-size: 14px;
+  font-size: 12px;
 }
 .totalTime-field {
   pointer-events: none;

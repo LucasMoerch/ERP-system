@@ -2,44 +2,52 @@ import { renderCard } from '../cardComponent/cardComponent';
 import { createFloatingInput, createFloatingTextarea } from '../floatingLabel/floatingLabel';
 import type { UserRole } from '../../pages/staff';
 import { showCancelConfirmation } from '../cancelPopUp/cancelPopUp';
+import type { InvitePayload } from '../../pages/staff';
 
 export function renderAddNewStaffCard(
-  onInvite?: (email: string, role: UserRole[]) => Promise<boolean>,
+  onInvite?: (payload: InvitePayload) => Promise<boolean>,
 ): HTMLElement {
   // Create overlay
   const overlay = renderCard({ edit: false, endpoint: 'users/create', hasChanges: () => isTyped });
   const card: HTMLElement = overlay.querySelector('.card') as HTMLElement;
   const header: HTMLElement = card.querySelector('.header') as HTMLElement;
+  const titleEl: HTMLElement = header.querySelector('h2') as HTMLElement;
   const body: HTMLElement = card.querySelector('.body') as HTMLElement;
 
-  // HEADER
-  header.innerHTML = `<h4 class="m-0 text-center fw-semibold">Add New Staff</h4>`;
+  // Title
+  titleEl.innerHTML = `<h4 class="m-0 text-center fw-semibold">Add New Staff</h4>`;
 
   // BODY CONTENT
   const formContainer = document.createElement('div');
   formContainer.className = 'container p-4 rounded';
 
   //Use the new reusable floating label helpers
-  const nameField = createFloatingInput('staffName', 'Full Name *', 'text');
+  const firstNameField = createFloatingInput('staffFirstName', 'First Name *', 'text');
+  const lastNameField = createFloatingInput('staffLastName', 'Last Name *', 'text');
   const phoneField = createFloatingInput('staffPhone', 'Mobile Number', 'tel');
   const emailField = createFloatingInput('staffEmail', 'Email *', 'email');
   const addressField = createFloatingInput('staffAddress', 'Address', 'text');
   const cprField = createFloatingInput('staffCpr', 'CPR *', 'tel');
-  const descField = createFloatingTextarea('staffDesc', 'Description', 4);
 
   const adminCheckWrapper = document.createElement('div');
-  adminCheckWrapper.className = 'form-check mb-3';
+  adminCheckWrapper.className = 'd-flex gap-3 mb-3';
   adminCheckWrapper.innerHTML = `
-    <input type="checkbox" class="form-check-input" id="isAdmin" />
-    <label class="form-check-label" for="isAdmin">Admin access</label>
+    <div class="form-check">
+      <input type="checkbox" class="form-check-input" id="isStaff" checked />
+      <label class="form-check-label" for="isStaff">Staff access</label>
+    </div>
+    <div class="form-check">
+      <input type="checkbox" class="form-check-input" id="isAdmin" />
+      <label class="form-check-label" for="isAdmin">Admin access</label>
+    </div>
     `;
 
-  formContainer.appendChild(nameField);
+  formContainer.appendChild(firstNameField);
+  formContainer.appendChild(lastNameField);
   formContainer.appendChild(phoneField);
   formContainer.appendChild(emailField);
   formContainer.appendChild(addressField);
   formContainer.appendChild(cprField);
-  formContainer.appendChild(descField);
   formContainer.appendChild(adminCheckWrapper);
 
   // BUTTON ROW
@@ -71,13 +79,14 @@ export function renderAddNewStaffCard(
     if (el.value.trim() !== '') isTyped = true;
   };
 
-  const nameInput = formContainer.querySelector('#staffName') as HTMLInputElement;
+  const firstNameInput = formContainer.querySelector('#staffFirstName') as HTMLInputElement;
+  const lastNameInput = formContainer.querySelector('#staffLastName') as HTMLInputElement;
   const phoneInput = formContainer.querySelector('#staffPhone') as HTMLInputElement;
   const emailInput = formContainer.querySelector('#staffEmail') as HTMLInputElement;
   const addressInput = formContainer.querySelector('#staffAddress') as HTMLInputElement;
   const cprInput = formContainer.querySelector('#staffCpr') as HTMLInputElement;
+  const isStaffInput = formContainer.querySelector('#isStaff') as HTMLInputElement;
   const isAdminInput = formContainer.querySelector('#isAdmin') as HTMLInputElement;
-  const descInput = formContainer.querySelector('#staffDesc') as HTMLTextAreaElement;
 
   // CPR formatting (xxxxxx-xxxx)
   cprInput.addEventListener('input', () => {
@@ -97,12 +106,14 @@ export function renderAddNewStaffCard(
     }
   });
 
-  nameInput.addEventListener('input', () => markTypedInput(nameInput));
+  firstNameInput.addEventListener('input', () => markTypedInput(firstNameInput));
+  lastNameInput.addEventListener('input', () => markTypedInput(lastNameInput));
+  cprInput.addEventListener('input', () => markTypedInput(cprInput));
   phoneInput.addEventListener('input', () => markTypedInput(phoneInput));
   emailInput.addEventListener('input', () => markTypedInput(emailInput));
   addressInput.addEventListener('input', () => markTypedInput(addressInput));
+  isStaffInput.addEventListener('input', () => markTypedInput(isStaffInput));
   isAdminInput.addEventListener('input', () => markTypedInput(isAdminInput));
-  descInput.addEventListener('input', () => markTypedInput(descInput));
 
   cancelBtn.addEventListener('click', () => {
     if (isTyped) {
@@ -113,25 +124,34 @@ export function renderAddNewStaffCard(
   });
 
   saveBtn.addEventListener('click', async () => {
-    const name = nameInput.value.trim();
+    const firstName = firstNameInput.value.trim();
+    const lastName = lastNameInput.value.trim();
+    const name = `${firstName} ${lastName}`.trim();
     const phone = phoneInput.value.trim();
     const email = emailInput.value.trim();
     const address = addressInput.value.trim();
     const cpr = cprInput.value.trim();
-    const desc = descInput.value.trim();
+    const isStaff = isStaffInput.checked;
     const isAdmin = isAdminInput.checked;
 
-    const role: UserRole = isAdmin ? 'admin' : 'staff';
+    const roles: UserRole[] = [];
+    if (isStaff) roles.push('staff');
+    if (isAdmin) roles.push('admin');
 
     // Reset all invalid states
-    nameInput.classList.remove('is-invalid');
+    firstNameInput.classList.remove('is-invalid');
+    lastNameInput.classList.remove('is-invalid');
     emailInput.classList.remove('is-invalid');
     cprInput.classList.remove('is-invalid');
 
     let hasError = false;
 
-    if (!name) {
-      nameInput.classList.add('is-invalid');
+    if (!firstName) {
+      firstNameInput.classList.add('is-invalid');
+      hasError = true;
+    }
+    if (!lastName) {
+      lastNameInput.classList.add('is-invalid');
       hasError = true;
     }
 
@@ -152,15 +172,22 @@ export function renderAddNewStaffCard(
       return;
     }
 
-    console.log('Submitting:', { name, phone, email, address, cpr, desc, role });
-
     if (!onInvite) {
       console.warn('No invite callback provided.');
       overlay.remove();
       return;
     }
 
-    const success = await onInvite(email, [role]);
+    const success = await onInvite({
+      email,
+      roles,
+      fullName: name,
+      firstName,
+      lastName,
+      phone,
+      address,
+      cpr,
+    });
     if (success) {
       overlay.remove();
 

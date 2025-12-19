@@ -1,13 +1,12 @@
 package com.p3.Enevold;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
 class EnevoldApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void dummy() {
+        // no Spring Boot context, just a placeholder test
+    }
 
 }

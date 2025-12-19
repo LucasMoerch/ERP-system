@@ -3,13 +3,13 @@ import { renderTable } from '../components/tableComponent/tableComponent';
 import { renderCard } from '../components/cardComponent/cardComponent';
 import { renderTabs } from '../components/tabsComponent/tabsComponent';
 import http from '../api/http';
+import { isAdmin } from '../auth/auth';
 
 export type ClientDTO = {
   id: string;
   name: string;
   contactPhone?: string;
   contactEmail?: string;
-  address?: string;
 };
 
 export function renderClientsPage(): HTMLElement {
@@ -41,9 +41,8 @@ export function renderClientsPage(): HTMLElement {
 
       const clientData = (clients ?? []).map((c) => ({
         name: c.name,
-        contactPhone: c.contactPhone || 'N/A',
-        contactEmail: c.contactEmail || 'N/A',
-        address: c.address || '-',
+        phone: c.contactPhone || 'N/A',
+        email: c.contactEmail || 'N/A',
       }));
 
       realDataSection.innerHTML = '';
@@ -58,7 +57,6 @@ export function renderClientsPage(): HTMLElement {
           const client = clients[index - 1];
           const popup = inspectClient(client);
           document.body.appendChild(popup);
-          console.log('client clicked');
         });
       });
     } catch (err) {
@@ -72,13 +70,16 @@ export function renderClientsPage(): HTMLElement {
     const overlay = renderCard({ edit: true, endpoint: 'clients', data: client });
     const card: HTMLElement = overlay.querySelector('.card') as HTMLElement;
     const headerEl: HTMLElement = card.querySelector('.header') as HTMLElement;
+    const titleEl: HTMLElement = headerEl.querySelector('h2') as HTMLElement;
     const body: HTMLElement = card.querySelector('.body') as HTMLElement;
 
     const backButton = overlay.querySelector('.closeBtn');
     if (backButton) backButton.remove();
 
-    headerEl.innerText = client.name;
-
+    if (titleEl) {
+      titleEl.innerText = client.name;
+      titleEl.title = client.name;
+    }
     const back = headerEl.querySelector('.exit-button');
     back?.addEventListener('click', () => overlay.remove());
 
@@ -91,22 +92,49 @@ export function renderClientsPage(): HTMLElement {
             <span class="value fw-semibold" data-field="name">${client.name}</span>
           </div>
           <div class="info-row d-flex justify-content-between border-bottom py-3">
-            <span class="label text-muted fw-medium">Contact</span>
+            <span class="label text-muted fw-medium">Phone</span>
             <span class="value fw-semibold" data-field="contactPhone">${client.contactPhone || 'N/A'}</span>
           </div>
           <div class="info-row d-flex justify-content-between border-bottom py-3">
             <span class="label text-muted fw-medium">Email</span>
             <span class="value fw-semibold" data-field="contactEmail">${client.contactEmail || 'N/A'}</span>
           </div>
-          <div class="info-row d-flex justify-content-between border-bottom py-3">
-            <span class="label text-muted fw-medium">Address</span>
-            <span class="value fw-semibold text-end" data-field="address">${client.address || 'N/A'}</span>
-          </div>
         </div>
       </div>
     `;
     card.appendChild(body);
     card.appendChild(renderTabs({ entityType: 'clients', entityId: client.id }));
+
+    // Delete button for admins
+    if (isAdmin()) {
+      const footer = document.createElement('div');
+      footer.className = 'd-flex justify-content-end gap-2 p-3';
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'btn btn-outline-danger delete-client-button';
+      deleteBtn.innerText = 'Delete client';
+
+      deleteBtn.addEventListener('click', async () => {
+        const confirmed = window.confirm(
+          `Are you sure you want to permanently delete client "${client.name}"?`,
+        );
+        if (!confirmed) return;
+
+        try {
+          await http.delete(`/clients/${client.id}`);
+          overlay.remove();
+
+          const clientsPage = document.querySelector('.clients-page') as any;
+          if (clientsPage?.reload) clientsPage.reload();
+        } catch (err) {
+          console.error('Failed to delete client', err);
+          alert('Failed to delete client. Please try again.');
+        }
+      });
+
+      footer.appendChild(deleteBtn);
+      card.appendChild(footer);
+    }
 
     return overlay;
   }

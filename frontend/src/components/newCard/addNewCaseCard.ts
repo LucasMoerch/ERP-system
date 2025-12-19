@@ -7,9 +7,10 @@ export function renderAddNewCaseCard(): HTMLElement {
   const overlay = renderCard({ edit: false, endpoint: 'cases/create', hasChanges: () => isTyped });
   const card = overlay.querySelector('.card') as HTMLElement;
   const header = card.querySelector('.header') as HTMLElement;
+  const titleEl: HTMLElement = header.querySelector('h2') as HTMLElement;
   const body = card.querySelector('.body') as HTMLElement;
 
-  header.innerHTML = `<h4 class="m-0 text-center fw-semibold">Add New Case</h4>`;
+  titleEl.innerHTML = `<h4 class="m-0 text-center fw-semibold">Add New Case</h4>`;
 
   const formContainer = document.createElement('div');
   formContainer.className = 'container p-4 rounded';
@@ -110,7 +111,6 @@ export function renderAddNewCaseCard(): HTMLElement {
         params: { title, description, status },
       });
 
-      console.log('Case created successfully:', data);
       alert(`Case created successfully.`);
 
       overlay.remove();
@@ -119,6 +119,11 @@ export function renderAddNewCaseCard(): HTMLElement {
 
       if (casesPage?.reload) {
         casesPage.reload(); // reload the cases page
+      }
+
+      const homePage = document.querySelector('.home-container') as any;
+      if (homePage?.reload) {
+        homePage.reload();
       }
     } catch (err: any) {
       const msg = err?.response?.data?.message || err?.message || 'Failed to create case.';

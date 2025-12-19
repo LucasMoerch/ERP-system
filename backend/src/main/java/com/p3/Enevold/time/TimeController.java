@@ -1,4 +1,5 @@
 package com.p3.Enevold.time;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -70,7 +71,8 @@ public class TimeController {
     }
 
     // Keep the DTO and the endpoint INSIDE the class
-    record TimeEntryDto(String startTime, String stopTime) {}
+    record TimeEntryDto(String startTime, String stopTime) {
+    }
 
     @GetMapping("/users/{userId}/last-time")
     public ResponseEntity<TimeEntryDto> getLastTime(@PathVariable String userId) {

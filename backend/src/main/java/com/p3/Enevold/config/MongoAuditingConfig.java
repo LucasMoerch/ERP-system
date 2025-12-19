@@ -12,12 +12,12 @@ import java.util.Optional;
 @Configuration
 @EnableMongoAuditing
 public class MongoAuditingConfig {
-  @Bean
-  public AuditorAware<String> auditorAware() {
-    System.out.println("MongoAuditingConfig: Setting up AuditorAware bean");
-    return () -> Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
-        .filter(Authentication::isAuthenticated)
-        .map(Authentication::getName) // returns the user id string
-        .filter(name -> !"anonymousUser".equals(name));
-  }
+    @Bean
+    public AuditorAware<String> auditorAware() {
+        System.out.println("MongoAuditingConfig: Setting up AuditorAware bean");
+        return () -> Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .filter(Authentication::isAuthenticated)
+                .map(Authentication::getName) // returns the user id string
+                .filter(name -> !"anonymousUser".equals(name));
+    }
 }

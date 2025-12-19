@@ -26,6 +26,14 @@ export async function loadTimeEntries(config: TimeTabConfig) {
   try {
     const entries = (await http.get(`/times/${entityType}/${entityId}`)) as TimeEntry[];
 
+    // Filter out incomple entries
+    for (let i = entries.length - 1; i >= 0; i--) {
+      const entry = entries[i];
+      if (!entry.startTime || !entry.stopTime || entry.totalTime === '00:00') {
+        entries.splice(i, 1);
+      }
+    }
+
     const timeContent = container.querySelector('#times-content') as HTMLElement | null;
     if (!timeContent) return;
 

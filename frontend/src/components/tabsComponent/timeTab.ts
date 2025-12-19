@@ -36,21 +36,6 @@ function minutesToHHMM(totalMinutes: number): string {
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 }
 
-function isInCurrentMonth(entry: TimeEntry): boolean {
-  const [dayStr, monthStr, yearStr] = entry.date.split('-');
-  const day = Number(dayStr);
-  const month = Number(monthStr); // 1–12
-  const year = Number(yearStr);
-
-  if (!day || !month || !year) return false;
-
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1; // JS months are 0-based
-
-  return year === currentYear && month === currentMonth;
-}
-
 function getMonthKey(entry: TimeEntry): string | null {
   const [dayStr, monthStr, yearStr] = entry.date.split('-');
   const day = Number(dayStr);

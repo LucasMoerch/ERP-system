@@ -36,21 +36,6 @@ function minutesToHHMM(totalMinutes: number): string {
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 }
 
-function isInCurrentMonth(entry: TimeEntry): boolean {
-  const [dayStr, monthStr, yearStr] = entry.date.split('-');
-  const day = Number(dayStr);
-  const month = Number(monthStr); // 1–12
-  const year = Number(yearStr);
-
-  if (!day || !month || !year) return false;
-
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1; // JS months are 0-based
-
-  return year === currentYear && month === currentMonth;
-}
-
 function getMonthKey(entry: TimeEntry): string | null {
   const [dayStr, monthStr, yearStr] = entry.date.split('-');
   const day = Number(dayStr);
@@ -73,6 +58,14 @@ export async function loadTimeEntries(config: TimeTabConfig) {
 
   try {
     const entries = (await http.get(`/times/${entityType}/${entityId}`)) as TimeEntry[];
+
+    // Filter out incomple entries
+    for (let i = entries.length - 1; i >= 0; i--) {
+      const entry = entries[i];
+      if (!entry.startTime || !entry.stopTime || entry.totalTime === '00:00') {
+        entries.splice(i, 1);
+      }
+    }
 
     const timeContent = container.querySelector('#times-content') as HTMLElement | null;
     if (!timeContent) return;

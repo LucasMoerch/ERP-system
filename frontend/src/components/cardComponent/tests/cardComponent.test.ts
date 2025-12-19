@@ -13,9 +13,7 @@ const mockHttpPut = http.put as jest.Mock;
 const mockLoadUsersAndClients = jest.fn();
 const mockCreateCheckboxDropdown = jest.fn();
 const mockNormalizeIdArray = jest.fn((v: any) => (Array.isArray(v) ? v : v ? [v] : []));
-const mockFriendlyForValue = jest.fn(
-  (value: any, map: Map<string, string> | undefined) => '',
-);
+const mockFriendlyForValue = jest.fn((value: any, map: Map<string, string> | undefined) => '');
 const mockShowCancelConfirmation = jest.fn();
 
 jest.mock('../dataLoader', () => ({
@@ -69,16 +67,12 @@ describe('renderCard', () => {
     const card = overlay.querySelector('.card') as HTMLElement;
     const header = card.querySelector('.header') as HTMLElement;
 
-    const headerGroups = header.querySelectorAll(
-      'div.d-flex.align-items-center.gap-2',
-    );
+    const headerGroups = header.querySelectorAll('div.d-flex.align-items-center.gap-2');
     // first is left group, second is actions group
     expect(headerGroups.length).toBe(2);
     const headerActions = headerGroups[1] as HTMLElement;
 
-    const spacer = headerActions.querySelector('button.invisible') as
-      | HTMLButtonElement
-      | null;
+    const spacer = headerActions.querySelector('button.invisible') as HTMLButtonElement | null;
     expect(spacer).not.toBeNull();
     expect(spacer!.querySelector('i.fa-pen-to-square')).not.toBeNull();
   });
@@ -88,18 +82,12 @@ describe('renderCard', () => {
     const card = overlay.querySelector('.card') as HTMLElement;
     const header = card.querySelector('.header') as HTMLElement;
 
-    const headerGroups = header.querySelectorAll(
-      'div.d-flex.align-items-center.gap-2',
-    );
+    const headerGroups = header.querySelectorAll('div.d-flex.align-items-center.gap-2');
     expect(headerGroups.length).toBe(2);
     const headerActions = headerGroups[1] as HTMLElement;
 
-    const spacer = headerActions.querySelector('button.invisible') as
-      | HTMLButtonElement
-      | null;
-    const editBtn = headerActions.querySelector(
-      'button.edit-button',
-    ) as HTMLButtonElement | null;
+    const spacer = headerActions.querySelector('button.invisible') as HTMLButtonElement | null;
+    const editBtn = headerActions.querySelector('button.edit-button') as HTMLButtonElement | null;
 
     expect(spacer).toBeNull();
     expect(editBtn).not.toBeNull();
@@ -176,13 +164,9 @@ describe('renderCard', () => {
 
     const card = overlay.querySelector('.card') as HTMLElement;
     const header = card.querySelector('.header') as HTMLElement;
-    const headerGroups = header.querySelectorAll(
-      'div.d-flex.align-items-center.gap-2',
-    );
+    const headerGroups = header.querySelectorAll('div.d-flex.align-items-center.gap-2');
     const headerActions = headerGroups[1] as HTMLElement;
-    const editBtn = headerActions.querySelector(
-      '.edit-button',
-    ) as HTMLButtonElement;
+    const editBtn = headerActions.querySelector('.edit-button') as HTMLButtonElement;
 
     // simulate info-row/title DOM so edit mode will find something to turn into input
     const body = card.querySelector('.body') as HTMLElement;
@@ -207,9 +191,7 @@ describe('renderCard', () => {
     input.value = 'New title';
     input.dispatchEvent(new Event('input', { bubbles: true }));
 
-    const saveBtn = headerActions.querySelector(
-      'button.btn-primary',
-    ) as HTMLButtonElement;
+    const saveBtn = headerActions.querySelector('button.btn-primary') as HTMLButtonElement;
     expect(saveBtn).not.toBeNull();
 
     await saveBtn.click();

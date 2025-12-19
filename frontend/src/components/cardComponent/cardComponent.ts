@@ -144,9 +144,9 @@ export function renderCard(options: RenderCardOptions = {}): HTMLElement {
           const initialRoles = Array.isArray(options.data?.roles)
             ? (options.data!.roles as string[])
             : (valueSpan.textContent || '')
-              .split(',')
-              .map((s) => s.trim())
-              .filter(Boolean);
+                .split(',')
+                .map((s) => s.trim())
+                .filter(Boolean);
 
           // fake "users" so we can reuse createCheckboxDropdown
           const fakeUsers = roleIds.map((id) => ({

@@ -49,9 +49,7 @@ describe('renderTable', () => {
   });
 
   test('applies responsive classes to columns after the second', () => {
-    const data = [
-      { col1: 'a', col2: 'b', col3: 'c', col4: 'd' },
-    ];
+    const data = [{ col1: 'a', col2: 'b', col3: 'c', col4: 'd' }];
 
     const container = renderTable(data);
     document.body.appendChild(container);
@@ -83,9 +81,7 @@ describe('renderTable', () => {
   });
 
   test('formats header names by replacing underscores and capitalizing', () => {
-    const data = [
-      { first_name: 'Alice', last_name: 'Smith' },
-    ];
+    const data = [{ first_name: 'Alice', last_name: 'Smith' }];
 
     const container = renderTable(data);
     document.body.appendChild(container);

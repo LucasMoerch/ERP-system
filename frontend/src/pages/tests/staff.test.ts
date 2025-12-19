@@ -95,12 +95,14 @@ describe('renderStaffPage', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(mockRenderTable).toHaveBeenCalledWith([{
-      name: 'User One',
-      role: 'staff',
-      status: 'active',
-      email: 'user@example.com',
-    },]);
+    expect(mockRenderTable).toHaveBeenCalledWith([
+      {
+        name: 'User One',
+        role: 'staff',
+        status: 'active',
+        email: 'user@example.com',
+      },
+    ]);
     expect(page.querySelector('table')).toBe(tableEl);
   });
 

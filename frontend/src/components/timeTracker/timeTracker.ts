@@ -155,13 +155,15 @@ function normalizeTimeToHMS(t: string): string {
 
 function calculateTotalTime(startTime: string, stopTime: string): string {
   const start = normalizeTimeToHMS(startTime);
-  const stop  = normalizeTimeToHMS(stopTime);
+  const stop = normalizeTimeToHMS(stopTime);
 
   const [startHours, startMinutes, startSeconds] = start.split(':').map(Number);
   const [stopHours, stopMinutes, stopSeconds] = stop.split(':').map(Number);
 
   let totalSeconds =
-    stopHours * 3600 + stopMinutes * 60 + stopSeconds -
+    stopHours * 3600 +
+    stopMinutes * 60 +
+    stopSeconds -
     (startHours * 3600 + startMinutes * 60 + startSeconds);
 
   if (totalSeconds < 0) totalSeconds += 24 * 3600;
@@ -204,12 +206,18 @@ function updateTotalTimeField(
 
   const startValue = startTimeInput.value;
   const stopValue = stopTimeInput.value;
-  if (startValue === '00:00:00' || stopValue === '00:00:00') {
+  const isZero = (v: string) => v === '00:00:00' || v === '00:00' || v === '';
+  if (isZero(startValue) || isZero(stopValue)) {
     totalTimeInput.value = '00:00:00';
     return;
   }
 
   totalTimeInput.value = calculateTotalTime(startValue, stopValue);
+}
+
+function toHM(t: string): string {
+  const [hh, mm] = normalizeTimeToHMS(t).split(':');
+  return `${hh}:${mm}`;
 }
 
 export function renderTimeTracker(): HTMLElement {
@@ -349,12 +357,13 @@ export function renderTimeTracker(): HTMLElement {
      <label for="totalTime" class="form-label">Total Time</label> <br>
      <div class="container col-12 rounded text-center bg-transparent py-1">
       <input
-        disabled
-        type="time"
-        step="1"
+        readonly
+        type="text"
+        inputmode="numeric"
         class="form-control totalTime-field mx-auto px-2 shadow-sm lighter-bg clockText text-center"
         id="totalTime"
-        value="00:00:00">
+        value="00:00:00"
+        >
      </div>
     </div>`;
     const calender: HTMLElement = renderCalendar();
@@ -431,7 +440,7 @@ export function renderTimeTracker(): HTMLElement {
 
       startTimeBtn.remove();
       buttonRow.appendChild(stopTimeBtn);
-      displayTime('startTime', startTimeNow);
+      displayTime('startTime', toHM(startTimeNow));
       //const result = await getTimeData();
       sendStartTimeData(startTimeNow, currentUserId, currentUserName, caseId);
     });
@@ -440,15 +449,18 @@ export function renderTimeTracker(): HTMLElement {
       //Gets the time of stopping
       const stopTimeNow: string = getTimeNow();
       buttonRow.appendChild(completeBtn);
-      displayTime('stopTime', stopTimeNow);
+      displayTime('stopTime', toHM(stopTimeNow));
       updateTotalTimeField(startTimeInputEl, stopTimeInputEl, totalTimeInputEl);
       stopTimeBtn.remove();
     });
 
     completeBtn.addEventListener('click', (): void => {
-      const startTimeInput: string = (document.getElementById('startTime') as HTMLInputElement)
-        .value;
-      const stopTimeInput: string = (document.getElementById('stopTime') as HTMLInputElement).value;
+      const startTimeInput = normalizeTimeToHMS(
+        (document.getElementById('startTime') as HTMLInputElement).value,
+      );
+      const stopTimeInput = normalizeTimeToHMS(
+        (document.getElementById('stopTime') as HTMLInputElement).value,
+      );
       const descriptionInput: string = (document.getElementById('description') as HTMLInputElement)
         .value;
       const calenderField: string = (document.getElementById('dateInput') as HTMLInputElement)
@@ -468,7 +480,7 @@ export function renderTimeTracker(): HTMLElement {
 
       popupSummary.innerHTML = `
         <div class="mb-3">
-          <div><strong>Case:</strong> ${caseId || 'Not selected'}</div>
+          <div><strong>Case:</strong> ${caseId || 'Other'}</div>
           <div><strong>Date:</strong> ${formattedDate}</div>
           <div><strong>Start:</strong> ${startTimeInput}</div>
           <div><strong>Stop:</strong> ${stopTimeInput}</div>
